@@ -1,0 +1,2119 @@
+Terminals which are not used
+
+   TDOT
+   WHITE_SPACE
+
+
+State 78 conflicts: 3 reduce/reduce
+State 80 conflicts: 3 reduce/reduce
+State 101 conflicts: 1 reduce/reduce
+State 110 conflicts: 2 shift/reduce
+State 125 conflicts: 4 shift/reduce
+State 140 conflicts: 2 shift/reduce
+State 141 conflicts: 2 shift/reduce
+
+
+Grammar
+
+    0 $accept: program $end
+
+    1 program: declaration otherDeclarations
+
+    2 otherDeclarations: declaration otherDeclarations
+    3                  | /* empty */
+
+    4 declaration: function
+
+    5 function: typeId TID TLPAREN argList TRPAREN bodyOrSemi
+
+    6 typeId: TINT
+    7       | TCHAR
+    8       | TBOOL
+    9       | TFLOAT
+   10       | TSTRING
+   11       | TVOID
+
+   12 argList: typeId TID otherArgs
+   13        | /* empty */
+
+   14 otherArgs: TCOMMA argList
+   15          | /* empty */
+
+   16 body: TLBRACE operatorBlock TRBRACE
+
+   17 bodyOrSemi: body
+   18           | TSEMICOLON
+
+   19 operatorBlock: operatorSC TSEMICOLON operatorBlock
+   20              | moperator operatorBlock
+   21              | /* empty */
+
+   22 operatorSC: varDecl
+   23           | assignment
+   24           | postLoop
+   25           | mreturn
+   26           | increment
+   27           | funCall
+   28           | TBREAK
+   29           | TCONTINUE
+
+   30 moperator: conditional
+   31          | whileLoop
+   32          | forLoop
+
+   33 increment: leftPartExpr TPLUSPLUS
+   34          | TPLUSPLUS leftPartExpr
+
+   35 varDecl: typeId TID arrayDim init
+
+   36 arrayDim: TLBRACKET dim TRBRACKET arrayDim
+   37         | /* empty */
+
+   38 dim: TNUM
+   39    | expr
+
+   40 init: TASG rightPartExpr
+   41     | /* empty */
+
+   42 rightPartExpr: expr
+   43              | arrayConst
+   44              | condition
+   45              | TSTRING_LIT
+   46              | TCHAR_LIT
+
+   47 leftPartExpr: TID indexing
+
+   48 arrayConst: TLBRACE arrayItems TRBRACE
+
+   49 arrayItems: arrayItem otherArrayItems
+
+   50 arrayItem: expr
+   51          | arrayConst
+
+   52 otherArrayItems: TCOMMA arrayItems
+   53                | /* empty */
+
+   54 expr: expr arithOp expr
+   55     | TLPAREN expr TRPAREN
+   56     | term
+
+   57 term: leftPartExpr
+   58     | funCall
+   59     | TNUM
+   60     | increment
+
+   61 arithOp: TPLUS
+   62        | TMINUS
+   63        | TMULT
+   64        | TDIV
+
+   65 indexing: TLBRACKET dim TRBRACKET indexing
+   66         | /* empty */
+
+   67 funCall: TID TLPAREN paramList TRPAREN
+
+   68 paramList: rightPartExpr otherParams
+
+   69 otherParams: TCOMMA paramList
+   70            | /* empty */
+
+   71 assignment: leftPartExpr TASG rightPartExpr
+
+   72 conditional: TIF TLPAREN condition TRPAREN body elseBlock
+
+   73 elseBlock: TELSE body
+   74          | TELIF TLPAREN condition TRPAREN body elseBlock
+   75          | /* empty */
+
+   76 condition: comparison
+   77          | condition TAND condition
+   78          | condition TOR condition
+   79          | TNOT condition
+   80          | TLPAREN condition TRPAREN
+   81          | leftPartExpr
+   82          | funCall
+
+   83 comparison: expr compare expr
+
+   84 compare: TEQ
+   85        | TNEQ
+   86        | TGT
+   87        | TLT
+   88        | TGE
+   89        | TLE
+
+   90 whileLoop: whileHeader bodyOrSemi
+
+   91 whileHeader: TWHILE TLPAREN condition TRPAREN
+
+   92 forLoop: TFOR TLPAREN forInit TRPAREN bodyOrSemi
+
+   93 forInit: varDecl TSEMICOLON condition TSEMICOLON expr
+
+   94 postLoop: TDO body whileHeader
+
+   95 mreturn: TRETURN exprOrNothing
+
+   96 exprOrNothing: expr
+   97              | /* empty */
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+error (256)
+TLPAREN (258) 5 55 67 72 74 80 91 92
+TRPAREN (259) 5 55 67 72 74 80 91 92
+TLBRACE (260) 16 48
+TRBRACE (261) 16 48
+TLBRACKET (262) 36 65
+TRBRACKET (263) 36 65
+TCOMMA (264) 14 52 69
+TSEMICOLON (265) 18 19 93
+TDOT (266)
+TINT (267) 6
+TCHAR (268) 7
+TBOOL (269) 8
+TFLOAT (270) 9
+TSTRING (271) 10
+TVOID (272) 11
+TASG (273) 40 71
+TEQ (274) 84
+TNEQ (275) 85
+TGT (276) 86
+TLT (277) 87
+TGE (278) 88
+TLE (279) 89
+TIF (280) 72
+TELSE (281) 73
+TELIF (282) 74
+TWHILE (283) 91
+TFOR (284) 92
+TDO (285) 94
+TPLUSPLUS (286) 33 34
+TRETURN (287) 95
+TBREAK (288) 28
+TCONTINUE (289) 29
+TAND (290) 77
+TOR (291) 78
+TNOT (292) 79
+TPLUS (293) 61
+TMINUS (294) 62
+TMULT (295) 63
+TDIV (296) 64
+TSTRING_LIT (297) 45
+TCHAR_LIT (298) 46
+WHITE_SPACE (299)
+TID (300) 5 12 35 47 67
+TNUM (301) 38 59
+
+
+Nonterminals, with rules where they appear
+
+$accept (47)
+    on left: 0
+program (48)
+    on left: 1, on right: 0
+otherDeclarations (49)
+    on left: 2 3, on right: 1 2
+declaration (50)
+    on left: 4, on right: 1 2
+function (51)
+    on left: 5, on right: 4
+typeId (52)
+    on left: 6 7 8 9 10 11, on right: 5 12 35
+argList (53)
+    on left: 12 13, on right: 5 14
+otherArgs (54)
+    on left: 14 15, on right: 12
+body (55)
+    on left: 16, on right: 17 72 73 74 94
+bodyOrSemi (56)
+    on left: 17 18, on right: 5 90 92
+operatorBlock (57)
+    on left: 19 20 21, on right: 16 19 20
+operatorSC (58)
+    on left: 22 23 24 25 26 27 28 29, on right: 19
+moperator (59)
+    on left: 30 31 32, on right: 20
+increment (60)
+    on left: 33 34, on right: 26 60
+varDecl (61)
+    on left: 35, on right: 22 93
+arrayDim (62)
+    on left: 36 37, on right: 35 36
+dim (63)
+    on left: 38 39, on right: 36 65
+init (64)
+    on left: 40 41, on right: 35
+rightPartExpr (65)
+    on left: 42 43 44 45 46, on right: 40 68 71
+leftPartExpr (66)
+    on left: 47, on right: 33 34 57 71 81
+arrayConst (67)
+    on left: 48, on right: 43 51
+arrayItems (68)
+    on left: 49, on right: 48 52
+arrayItem (69)
+    on left: 50 51, on right: 49
+otherArrayItems (70)
+    on left: 52 53, on right: 49
+expr (71)
+    on left: 54 55 56, on right: 39 42 50 54 55 83 93 96
+term (72)
+    on left: 57 58 59 60, on right: 56
+arithOp (73)
+    on left: 61 62 63 64, on right: 54
+indexing (74)
+    on left: 65 66, on right: 47 65
+funCall (75)
+    on left: 67, on right: 27 58 82
+paramList (76)
+    on left: 68, on right: 67 69
+otherParams (77)
+    on left: 69 70, on right: 68
+assignment (78)
+    on left: 71, on right: 23
+conditional (79)
+    on left: 72, on right: 30
+elseBlock (80)
+    on left: 73 74 75, on right: 72 74
+condition (81)
+    on left: 76 77 78 79 80 81 82, on right: 44 72 74 77 78 79 80 91
+    93
+comparison (82)
+    on left: 83, on right: 76
+compare (83)
+    on left: 84 85 86 87 88 89, on right: 83
+whileLoop (84)
+    on left: 90, on right: 31
+whileHeader (85)
+    on left: 91, on right: 90 94
+forLoop (86)
+    on left: 92, on right: 32
+forInit (87)
+    on left: 93, on right: 92
+postLoop (88)
+    on left: 94, on right: 24
+mreturn (89)
+    on left: 95, on right: 25
+exprOrNothing (90)
+    on left: 96 97, on right: 95
+
+
+state 0
+
+    0 $accept: . program $end
+
+    TINT     shift, and go to state 1
+    TCHAR    shift, and go to state 2
+    TBOOL    shift, and go to state 3
+    TFLOAT   shift, and go to state 4
+    TSTRING  shift, and go to state 5
+    TVOID    shift, and go to state 6
+
+    program      go to state 7
+    declaration  go to state 8
+    function     go to state 9
+    typeId       go to state 10
+
+
+state 1
+
+    6 typeId: TINT .
+
+    $default  reduce using rule 6 (typeId)
+
+
+state 2
+
+    7 typeId: TCHAR .
+
+    $default  reduce using rule 7 (typeId)
+
+
+state 3
+
+    8 typeId: TBOOL .
+
+    $default  reduce using rule 8 (typeId)
+
+
+state 4
+
+    9 typeId: TFLOAT .
+
+    $default  reduce using rule 9 (typeId)
+
+
+state 5
+
+   10 typeId: TSTRING .
+
+    $default  reduce using rule 10 (typeId)
+
+
+state 6
+
+   11 typeId: TVOID .
+
+    $default  reduce using rule 11 (typeId)
+
+
+state 7
+
+    0 $accept: program . $end
+
+    $end  shift, and go to state 11
+
+
+state 8
+
+    1 program: declaration . otherDeclarations
+
+    TINT     shift, and go to state 1
+    TCHAR    shift, and go to state 2
+    TBOOL    shift, and go to state 3
+    TFLOAT   shift, and go to state 4
+    TSTRING  shift, and go to state 5
+    TVOID    shift, and go to state 6
+
+    $default  reduce using rule 3 (otherDeclarations)
+
+    otherDeclarations  go to state 12
+    declaration        go to state 13
+    function           go to state 9
+    typeId             go to state 10
+
+
+state 9
+
+    4 declaration: function .
+
+    $default  reduce using rule 4 (declaration)
+
+
+state 10
+
+    5 function: typeId . TID TLPAREN argList TRPAREN bodyOrSemi
+
+    TID  shift, and go to state 14
+
+
+state 11
+
+    0 $accept: program $end .
+
+    $default  accept
+
+
+state 12
+
+    1 program: declaration otherDeclarations .
+
+    $default  reduce using rule 1 (program)
+
+
+state 13
+
+    2 otherDeclarations: declaration . otherDeclarations
+
+    TINT     shift, and go to state 1
+    TCHAR    shift, and go to state 2
+    TBOOL    shift, and go to state 3
+    TFLOAT   shift, and go to state 4
+    TSTRING  shift, and go to state 5
+    TVOID    shift, and go to state 6
+
+    $default  reduce using rule 3 (otherDeclarations)
+
+    otherDeclarations  go to state 15
+    declaration        go to state 13
+    function           go to state 9
+    typeId             go to state 10
+
+
+state 14
+
+    5 function: typeId TID . TLPAREN argList TRPAREN bodyOrSemi
+
+    TLPAREN  shift, and go to state 16
+
+
+state 15
+
+    2 otherDeclarations: declaration otherDeclarations .
+
+    $default  reduce using rule 2 (otherDeclarations)
+
+
+state 16
+
+    5 function: typeId TID TLPAREN . argList TRPAREN bodyOrSemi
+
+    TINT     shift, and go to state 1
+    TCHAR    shift, and go to state 2
+    TBOOL    shift, and go to state 3
+    TFLOAT   shift, and go to state 4
+    TSTRING  shift, and go to state 5
+    TVOID    shift, and go to state 6
+
+    $default  reduce using rule 13 (argList)
+
+    typeId   go to state 17
+    argList  go to state 18
+
+
+state 17
+
+   12 argList: typeId . TID otherArgs
+
+    TID  shift, and go to state 19
+
+
+state 18
+
+    5 function: typeId TID TLPAREN argList . TRPAREN bodyOrSemi
+
+    TRPAREN  shift, and go to state 20
+
+
+state 19
+
+   12 argList: typeId TID . otherArgs
+
+    TCOMMA  shift, and go to state 21
+
+    $default  reduce using rule 15 (otherArgs)
+
+    otherArgs  go to state 22
+
+
+state 20
+
+    5 function: typeId TID TLPAREN argList TRPAREN . bodyOrSemi
+
+    TLBRACE     shift, and go to state 23
+    TSEMICOLON  shift, and go to state 24
+
+    body        go to state 25
+    bodyOrSemi  go to state 26
+
+
+state 21
+
+   14 otherArgs: TCOMMA . argList
+
+    TINT     shift, and go to state 1
+    TCHAR    shift, and go to state 2
+    TBOOL    shift, and go to state 3
+    TFLOAT   shift, and go to state 4
+    TSTRING  shift, and go to state 5
+    TVOID    shift, and go to state 6
+
+    $default  reduce using rule 13 (argList)
+
+    typeId   go to state 17
+    argList  go to state 27
+
+
+state 22
+
+   12 argList: typeId TID otherArgs .
+
+    $default  reduce using rule 12 (argList)
+
+
+state 23
+
+   16 body: TLBRACE . operatorBlock TRBRACE
+
+    TINT       shift, and go to state 1
+    TCHAR      shift, and go to state 2
+    TBOOL      shift, and go to state 3
+    TFLOAT     shift, and go to state 4
+    TSTRING    shift, and go to state 5
+    TVOID      shift, and go to state 6
+    TIF        shift, and go to state 28
+    TWHILE     shift, and go to state 29
+    TFOR       shift, and go to state 30
+    TDO        shift, and go to state 31
+    TPLUSPLUS  shift, and go to state 32
+    TRETURN    shift, and go to state 33
+    TBREAK     shift, and go to state 34
+    TCONTINUE  shift, and go to state 35
+    TID        shift, and go to state 36
+
+    $default  reduce using rule 21 (operatorBlock)
+
+    typeId         go to state 37
+    operatorBlock  go to state 38
+    operatorSC     go to state 39
+    moperator      go to state 40
+    increment      go to state 41
+    varDecl        go to state 42
+    leftPartExpr   go to state 43
+    funCall        go to state 44
+    assignment     go to state 45
+    conditional    go to state 46
+    whileLoop      go to state 47
+    whileHeader    go to state 48
+    forLoop        go to state 49
+    postLoop       go to state 50
+    mreturn        go to state 51
+
+
+state 24
+
+   18 bodyOrSemi: TSEMICOLON .
+
+    $default  reduce using rule 18 (bodyOrSemi)
+
+
+state 25
+
+   17 bodyOrSemi: body .
+
+    $default  reduce using rule 17 (bodyOrSemi)
+
+
+state 26
+
+    5 function: typeId TID TLPAREN argList TRPAREN bodyOrSemi .
+
+    $default  reduce using rule 5 (function)
+
+
+state 27
+
+   14 otherArgs: TCOMMA argList .
+
+    $default  reduce using rule 14 (otherArgs)
+
+
+state 28
+
+   72 conditional: TIF . TLPAREN condition TRPAREN body elseBlock
+
+    TLPAREN  shift, and go to state 52
+
+
+state 29
+
+   91 whileHeader: TWHILE . TLPAREN condition TRPAREN
+
+    TLPAREN  shift, and go to state 53
+
+
+state 30
+
+   92 forLoop: TFOR . TLPAREN forInit TRPAREN bodyOrSemi
+
+    TLPAREN  shift, and go to state 54
+
+
+state 31
+
+   94 postLoop: TDO . body whileHeader
+
+    TLBRACE  shift, and go to state 23
+
+    body  go to state 55
+
+
+state 32
+
+   34 increment: TPLUSPLUS . leftPartExpr
+
+    TID  shift, and go to state 56
+
+    leftPartExpr  go to state 57
+
+
+state 33
+
+   95 mreturn: TRETURN . exprOrNothing
+
+    TLPAREN    shift, and go to state 58
+    TPLUSPLUS  shift, and go to state 32
+    TID        shift, and go to state 36
+    TNUM       shift, and go to state 59
+
+    $default  reduce using rule 97 (exprOrNothing)
+
+    increment      go to state 60
+    leftPartExpr   go to state 61
+    expr           go to state 62
+    term           go to state 63
+    funCall        go to state 64
+    exprOrNothing  go to state 65
+
+
+state 34
+
+   28 operatorSC: TBREAK .
+
+    $default  reduce using rule 28 (operatorSC)
+
+
+state 35
+
+   29 operatorSC: TCONTINUE .
+
+    $default  reduce using rule 29 (operatorSC)
+
+
+state 36
+
+   47 leftPartExpr: TID . indexing
+   67 funCall: TID . TLPAREN paramList TRPAREN
+
+    TLPAREN    shift, and go to state 66
+    TLBRACKET  shift, and go to state 67
+
+    $default  reduce using rule 66 (indexing)
+
+    indexing  go to state 68
+
+
+state 37
+
+   35 varDecl: typeId . TID arrayDim init
+
+    TID  shift, and go to state 69
+
+
+state 38
+
+   16 body: TLBRACE operatorBlock . TRBRACE
+
+    TRBRACE  shift, and go to state 70
+
+
+state 39
+
+   19 operatorBlock: operatorSC . TSEMICOLON operatorBlock
+
+    TSEMICOLON  shift, and go to state 71
+
+
+state 40
+
+   20 operatorBlock: moperator . operatorBlock
+
+    TINT       shift, and go to state 1
+    TCHAR      shift, and go to state 2
+    TBOOL      shift, and go to state 3
+    TFLOAT     shift, and go to state 4
+    TSTRING    shift, and go to state 5
+    TVOID      shift, and go to state 6
+    TIF        shift, and go to state 28
+    TWHILE     shift, and go to state 29
+    TFOR       shift, and go to state 30
+    TDO        shift, and go to state 31
+    TPLUSPLUS  shift, and go to state 32
+    TRETURN    shift, and go to state 33
+    TBREAK     shift, and go to state 34
+    TCONTINUE  shift, and go to state 35
+    TID        shift, and go to state 36
+
+    $default  reduce using rule 21 (operatorBlock)
+
+    typeId         go to state 37
+    operatorBlock  go to state 72
+    operatorSC     go to state 39
+    moperator      go to state 40
+    increment      go to state 41
+    varDecl        go to state 42
+    leftPartExpr   go to state 43
+    funCall        go to state 44
+    assignment     go to state 45
+    conditional    go to state 46
+    whileLoop      go to state 47
+    whileHeader    go to state 48
+    forLoop        go to state 49
+    postLoop       go to state 50
+    mreturn        go to state 51
+
+
+state 41
+
+   26 operatorSC: increment .
+
+    $default  reduce using rule 26 (operatorSC)
+
+
+state 42
+
+   22 operatorSC: varDecl .
+
+    $default  reduce using rule 22 (operatorSC)
+
+
+state 43
+
+   33 increment: leftPartExpr . TPLUSPLUS
+   71 assignment: leftPartExpr . TASG rightPartExpr
+
+    TASG       shift, and go to state 73
+    TPLUSPLUS  shift, and go to state 74
+
+
+state 44
+
+   27 operatorSC: funCall .
+
+    $default  reduce using rule 27 (operatorSC)
+
+
+state 45
+
+   23 operatorSC: assignment .
+
+    $default  reduce using rule 23 (operatorSC)
+
+
+state 46
+
+   30 moperator: conditional .
+
+    $default  reduce using rule 30 (moperator)
+
+
+state 47
+
+   31 moperator: whileLoop .
+
+    $default  reduce using rule 31 (moperator)
+
+
+state 48
+
+   90 whileLoop: whileHeader . bodyOrSemi
+
+    TLBRACE     shift, and go to state 23
+    TSEMICOLON  shift, and go to state 24
+
+    body        go to state 25
+    bodyOrSemi  go to state 75
+
+
+state 49
+
+   32 moperator: forLoop .
+
+    $default  reduce using rule 32 (moperator)
+
+
+state 50
+
+   24 operatorSC: postLoop .
+
+    $default  reduce using rule 24 (operatorSC)
+
+
+state 51
+
+   25 operatorSC: mreturn .
+
+    $default  reduce using rule 25 (operatorSC)
+
+
+state 52
+
+   72 conditional: TIF TLPAREN . condition TRPAREN body elseBlock
+
+    TLPAREN    shift, and go to state 76
+    TPLUSPLUS  shift, and go to state 32
+    TNOT       shift, and go to state 77
+    TID        shift, and go to state 36
+    TNUM       shift, and go to state 59
+
+    increment     go to state 60
+    leftPartExpr  go to state 78
+    expr          go to state 79
+    term          go to state 63
+    funCall       go to state 80
+    condition     go to state 81
+    comparison    go to state 82
+
+
+state 53
+
+   91 whileHeader: TWHILE TLPAREN . condition TRPAREN
+
+    TLPAREN    shift, and go to state 76
+    TPLUSPLUS  shift, and go to state 32
+    TNOT       shift, and go to state 77
+    TID        shift, and go to state 36
+    TNUM       shift, and go to state 59
+
+    increment     go to state 60
+    leftPartExpr  go to state 78
+    expr          go to state 79
+    term          go to state 63
+    funCall       go to state 80
+    condition     go to state 83
+    comparison    go to state 82
+
+
+state 54
+
+   92 forLoop: TFOR TLPAREN . forInit TRPAREN bodyOrSemi
+
+    TINT     shift, and go to state 1
+    TCHAR    shift, and go to state 2
+    TBOOL    shift, and go to state 3
+    TFLOAT   shift, and go to state 4
+    TSTRING  shift, and go to state 5
+    TVOID    shift, and go to state 6
+
+    typeId   go to state 37
+    varDecl  go to state 84
+    forInit  go to state 85
+
+
+state 55
+
+   94 postLoop: TDO body . whileHeader
+
+    TWHILE  shift, and go to state 29
+
+    whileHeader  go to state 86
+
+
+state 56
+
+   47 leftPartExpr: TID . indexing
+
+    TLBRACKET  shift, and go to state 67
+
+    $default  reduce using rule 66 (indexing)
+
+    indexing  go to state 68
+
+
+state 57
+
+   34 increment: TPLUSPLUS leftPartExpr .
+
+    $default  reduce using rule 34 (increment)
+
+
+state 58
+
+   55 expr: TLPAREN . expr TRPAREN
+
+    TLPAREN    shift, and go to state 58
+    TPLUSPLUS  shift, and go to state 32
+    TID        shift, and go to state 36
+    TNUM       shift, and go to state 59
+
+    increment     go to state 60
+    leftPartExpr  go to state 61
+    expr          go to state 87
+    term          go to state 63
+    funCall       go to state 64
+
+
+state 59
+
+   59 term: TNUM .
+
+    $default  reduce using rule 59 (term)
+
+
+state 60
+
+   60 term: increment .
+
+    $default  reduce using rule 60 (term)
+
+
+state 61
+
+   33 increment: leftPartExpr . TPLUSPLUS
+   57 term: leftPartExpr .
+
+    TPLUSPLUS  shift, and go to state 74
+
+    $default  reduce using rule 57 (term)
+
+
+state 62
+
+   54 expr: expr . arithOp expr
+   96 exprOrNothing: expr .
+
+    TPLUS   shift, and go to state 88
+    TMINUS  shift, and go to state 89
+    TMULT   shift, and go to state 90
+    TDIV    shift, and go to state 91
+
+    $default  reduce using rule 96 (exprOrNothing)
+
+    arithOp  go to state 92
+
+
+state 63
+
+   56 expr: term .
+
+    $default  reduce using rule 56 (expr)
+
+
+state 64
+
+   58 term: funCall .
+
+    $default  reduce using rule 58 (term)
+
+
+state 65
+
+   95 mreturn: TRETURN exprOrNothing .
+
+    $default  reduce using rule 95 (mreturn)
+
+
+state 66
+
+   67 funCall: TID TLPAREN . paramList TRPAREN
+
+    TLPAREN      shift, and go to state 76
+    TLBRACE      shift, and go to state 93
+    TPLUSPLUS    shift, and go to state 32
+    TNOT         shift, and go to state 77
+    TSTRING_LIT  shift, and go to state 94
+    TCHAR_LIT    shift, and go to state 95
+    TID          shift, and go to state 36
+    TNUM         shift, and go to state 59
+
+    increment      go to state 60
+    rightPartExpr  go to state 96
+    leftPartExpr   go to state 78
+    arrayConst     go to state 97
+    expr           go to state 98
+    term           go to state 63
+    funCall        go to state 80
+    paramList      go to state 99
+    condition      go to state 100
+    comparison     go to state 82
+
+
+state 67
+
+   65 indexing: TLBRACKET . dim TRBRACKET indexing
+
+    TLPAREN    shift, and go to state 58
+    TPLUSPLUS  shift, and go to state 32
+    TID        shift, and go to state 36
+    TNUM       shift, and go to state 101
+
+    increment     go to state 60
+    dim           go to state 102
+    leftPartExpr  go to state 61
+    expr          go to state 103
+    term          go to state 63
+    funCall       go to state 64
+
+
+state 68
+
+   47 leftPartExpr: TID indexing .
+
+    $default  reduce using rule 47 (leftPartExpr)
+
+
+state 69
+
+   35 varDecl: typeId TID . arrayDim init
+
+    TLBRACKET  shift, and go to state 104
+
+    $default  reduce using rule 37 (arrayDim)
+
+    arrayDim  go to state 105
+
+
+state 70
+
+   16 body: TLBRACE operatorBlock TRBRACE .
+
+    $default  reduce using rule 16 (body)
+
+
+state 71
+
+   19 operatorBlock: operatorSC TSEMICOLON . operatorBlock
+
+    TINT       shift, and go to state 1
+    TCHAR      shift, and go to state 2
+    TBOOL      shift, and go to state 3
+    TFLOAT     shift, and go to state 4
+    TSTRING    shift, and go to state 5
+    TVOID      shift, and go to state 6
+    TIF        shift, and go to state 28
+    TWHILE     shift, and go to state 29
+    TFOR       shift, and go to state 30
+    TDO        shift, and go to state 31
+    TPLUSPLUS  shift, and go to state 32
+    TRETURN    shift, and go to state 33
+    TBREAK     shift, and go to state 34
+    TCONTINUE  shift, and go to state 35
+    TID        shift, and go to state 36
+
+    $default  reduce using rule 21 (operatorBlock)
+
+    typeId         go to state 37
+    operatorBlock  go to state 106
+    operatorSC     go to state 39
+    moperator      go to state 40
+    increment      go to state 41
+    varDecl        go to state 42
+    leftPartExpr   go to state 43
+    funCall        go to state 44
+    assignment     go to state 45
+    conditional    go to state 46
+    whileLoop      go to state 47
+    whileHeader    go to state 48
+    forLoop        go to state 49
+    postLoop       go to state 50
+    mreturn        go to state 51
+
+
+state 72
+
+   20 operatorBlock: moperator operatorBlock .
+
+    $default  reduce using rule 20 (operatorBlock)
+
+
+state 73
+
+   71 assignment: leftPartExpr TASG . rightPartExpr
+
+    TLPAREN      shift, and go to state 76
+    TLBRACE      shift, and go to state 93
+    TPLUSPLUS    shift, and go to state 32
+    TNOT         shift, and go to state 77
+    TSTRING_LIT  shift, and go to state 94
+    TCHAR_LIT    shift, and go to state 95
+    TID          shift, and go to state 36
+    TNUM         shift, and go to state 59
+
+    increment      go to state 60
+    rightPartExpr  go to state 107
+    leftPartExpr   go to state 78
+    arrayConst     go to state 97
+    expr           go to state 98
+    term           go to state 63
+    funCall        go to state 80
+    condition      go to state 100
+    comparison     go to state 82
+
+
+state 74
+
+   33 increment: leftPartExpr TPLUSPLUS .
+
+    $default  reduce using rule 33 (increment)
+
+
+state 75
+
+   90 whileLoop: whileHeader bodyOrSemi .
+
+    $default  reduce using rule 90 (whileLoop)
+
+
+state 76
+
+   55 expr: TLPAREN . expr TRPAREN
+   80 condition: TLPAREN . condition TRPAREN
+
+    TLPAREN    shift, and go to state 76
+    TPLUSPLUS  shift, and go to state 32
+    TNOT       shift, and go to state 77
+    TID        shift, and go to state 36
+    TNUM       shift, and go to state 59
+
+    increment     go to state 60
+    leftPartExpr  go to state 78
+    expr          go to state 108
+    term          go to state 63
+    funCall       go to state 80
+    condition     go to state 109
+    comparison    go to state 82
+
+
+state 77
+
+   79 condition: TNOT . condition
+
+    TLPAREN    shift, and go to state 76
+    TPLUSPLUS  shift, and go to state 32
+    TNOT       shift, and go to state 77
+    TID        shift, and go to state 36
+    TNUM       shift, and go to state 59
+
+    increment     go to state 60
+    leftPartExpr  go to state 78
+    expr          go to state 79
+    term          go to state 63
+    funCall       go to state 80
+    condition     go to state 110
+    comparison    go to state 82
+
+
+state 78
+
+   33 increment: leftPartExpr . TPLUSPLUS
+   57 term: leftPartExpr .
+   81 condition: leftPartExpr .
+
+    TPLUSPLUS  shift, and go to state 74
+
+    TRPAREN     reduce using rule 57 (term)
+    TRPAREN     [reduce using rule 81 (condition)]
+    TCOMMA      reduce using rule 57 (term)
+    TCOMMA      [reduce using rule 81 (condition)]
+    TSEMICOLON  reduce using rule 57 (term)
+    TSEMICOLON  [reduce using rule 81 (condition)]
+    TAND        reduce using rule 81 (condition)
+    TOR         reduce using rule 81 (condition)
+    $default    reduce using rule 57 (term)
+
+
+state 79
+
+   54 expr: expr . arithOp expr
+   83 comparison: expr . compare expr
+
+    TEQ     shift, and go to state 111
+    TNEQ    shift, and go to state 112
+    TGT     shift, and go to state 113
+    TLT     shift, and go to state 114
+    TGE     shift, and go to state 115
+    TLE     shift, and go to state 116
+    TPLUS   shift, and go to state 88
+    TMINUS  shift, and go to state 89
+    TMULT   shift, and go to state 90
+    TDIV    shift, and go to state 91
+
+    arithOp  go to state 92
+    compare  go to state 117
+
+
+state 80
+
+   58 term: funCall .
+   82 condition: funCall .
+
+    TRPAREN     reduce using rule 58 (term)
+    TRPAREN     [reduce using rule 82 (condition)]
+    TCOMMA      reduce using rule 58 (term)
+    TCOMMA      [reduce using rule 82 (condition)]
+    TSEMICOLON  reduce using rule 58 (term)
+    TSEMICOLON  [reduce using rule 82 (condition)]
+    TAND        reduce using rule 82 (condition)
+    TOR         reduce using rule 82 (condition)
+    $default    reduce using rule 58 (term)
+
+
+state 81
+
+   72 conditional: TIF TLPAREN condition . TRPAREN body elseBlock
+   77 condition: condition . TAND condition
+   78          | condition . TOR condition
+
+    TRPAREN  shift, and go to state 118
+    TAND     shift, and go to state 119
+    TOR      shift, and go to state 120
+
+
+state 82
+
+   76 condition: comparison .
+
+    $default  reduce using rule 76 (condition)
+
+
+state 83
+
+   77 condition: condition . TAND condition
+   78          | condition . TOR condition
+   91 whileHeader: TWHILE TLPAREN condition . TRPAREN
+
+    TRPAREN  shift, and go to state 121
+    TAND     shift, and go to state 119
+    TOR      shift, and go to state 120
+
+
+state 84
+
+   93 forInit: varDecl . TSEMICOLON condition TSEMICOLON expr
+
+    TSEMICOLON  shift, and go to state 122
+
+
+state 85
+
+   92 forLoop: TFOR TLPAREN forInit . TRPAREN bodyOrSemi
+
+    TRPAREN  shift, and go to state 123
+
+
+state 86
+
+   94 postLoop: TDO body whileHeader .
+
+    $default  reduce using rule 94 (postLoop)
+
+
+state 87
+
+   54 expr: expr . arithOp expr
+   55     | TLPAREN expr . TRPAREN
+
+    TRPAREN  shift, and go to state 124
+    TPLUS    shift, and go to state 88
+    TMINUS   shift, and go to state 89
+    TMULT    shift, and go to state 90
+    TDIV     shift, and go to state 91
+
+    arithOp  go to state 92
+
+
+state 88
+
+   61 arithOp: TPLUS .
+
+    $default  reduce using rule 61 (arithOp)
+
+
+state 89
+
+   62 arithOp: TMINUS .
+
+    $default  reduce using rule 62 (arithOp)
+
+
+state 90
+
+   63 arithOp: TMULT .
+
+    $default  reduce using rule 63 (arithOp)
+
+
+state 91
+
+   64 arithOp: TDIV .
+
+    $default  reduce using rule 64 (arithOp)
+
+
+state 92
+
+   54 expr: expr arithOp . expr
+
+    TLPAREN    shift, and go to state 58
+    TPLUSPLUS  shift, and go to state 32
+    TID        shift, and go to state 36
+    TNUM       shift, and go to state 59
+
+    increment     go to state 60
+    leftPartExpr  go to state 61
+    expr          go to state 125
+    term          go to state 63
+    funCall       go to state 64
+
+
+state 93
+
+   48 arrayConst: TLBRACE . arrayItems TRBRACE
+
+    TLPAREN    shift, and go to state 58
+    TLBRACE    shift, and go to state 93
+    TPLUSPLUS  shift, and go to state 32
+    TID        shift, and go to state 36
+    TNUM       shift, and go to state 59
+
+    increment     go to state 60
+    leftPartExpr  go to state 61
+    arrayConst    go to state 126
+    arrayItems    go to state 127
+    arrayItem     go to state 128
+    expr          go to state 129
+    term          go to state 63
+    funCall       go to state 64
+
+
+state 94
+
+   45 rightPartExpr: TSTRING_LIT .
+
+    $default  reduce using rule 45 (rightPartExpr)
+
+
+state 95
+
+   46 rightPartExpr: TCHAR_LIT .
+
+    $default  reduce using rule 46 (rightPartExpr)
+
+
+state 96
+
+   68 paramList: rightPartExpr . otherParams
+
+    TCOMMA  shift, and go to state 130
+
+    $default  reduce using rule 70 (otherParams)
+
+    otherParams  go to state 131
+
+
+state 97
+
+   43 rightPartExpr: arrayConst .
+
+    $default  reduce using rule 43 (rightPartExpr)
+
+
+state 98
+
+   42 rightPartExpr: expr .
+   54 expr: expr . arithOp expr
+   83 comparison: expr . compare expr
+
+    TEQ     shift, and go to state 111
+    TNEQ    shift, and go to state 112
+    TGT     shift, and go to state 113
+    TLT     shift, and go to state 114
+    TGE     shift, and go to state 115
+    TLE     shift, and go to state 116
+    TPLUS   shift, and go to state 88
+    TMINUS  shift, and go to state 89
+    TMULT   shift, and go to state 90
+    TDIV    shift, and go to state 91
+
+    $default  reduce using rule 42 (rightPartExpr)
+
+    arithOp  go to state 92
+    compare  go to state 117
+
+
+state 99
+
+   67 funCall: TID TLPAREN paramList . TRPAREN
+
+    TRPAREN  shift, and go to state 132
+
+
+state 100
+
+   44 rightPartExpr: condition .
+   77 condition: condition . TAND condition
+   78          | condition . TOR condition
+
+    TAND  shift, and go to state 119
+    TOR   shift, and go to state 120
+
+    $default  reduce using rule 44 (rightPartExpr)
+
+
+state 101
+
+   38 dim: TNUM .
+   59 term: TNUM .
+
+    TRBRACKET  reduce using rule 38 (dim)
+    TRBRACKET  [reduce using rule 59 (term)]
+    $default   reduce using rule 59 (term)
+
+
+state 102
+
+   65 indexing: TLBRACKET dim . TRBRACKET indexing
+
+    TRBRACKET  shift, and go to state 133
+
+
+state 103
+
+   39 dim: expr .
+   54 expr: expr . arithOp expr
+
+    TPLUS   shift, and go to state 88
+    TMINUS  shift, and go to state 89
+    TMULT   shift, and go to state 90
+    TDIV    shift, and go to state 91
+
+    $default  reduce using rule 39 (dim)
+
+    arithOp  go to state 92
+
+
+state 104
+
+   36 arrayDim: TLBRACKET . dim TRBRACKET arrayDim
+
+    TLPAREN    shift, and go to state 58
+    TPLUSPLUS  shift, and go to state 32
+    TID        shift, and go to state 36
+    TNUM       shift, and go to state 101
+
+    increment     go to state 60
+    dim           go to state 134
+    leftPartExpr  go to state 61
+    expr          go to state 103
+    term          go to state 63
+    funCall       go to state 64
+
+
+state 105
+
+   35 varDecl: typeId TID arrayDim . init
+
+    TASG  shift, and go to state 135
+
+    $default  reduce using rule 41 (init)
+
+    init  go to state 136
+
+
+state 106
+
+   19 operatorBlock: operatorSC TSEMICOLON operatorBlock .
+
+    $default  reduce using rule 19 (operatorBlock)
+
+
+state 107
+
+   71 assignment: leftPartExpr TASG rightPartExpr .
+
+    $default  reduce using rule 71 (assignment)
+
+
+state 108
+
+   54 expr: expr . arithOp expr
+   55     | TLPAREN expr . TRPAREN
+   83 comparison: expr . compare expr
+
+    TRPAREN  shift, and go to state 124
+    TEQ      shift, and go to state 111
+    TNEQ     shift, and go to state 112
+    TGT      shift, and go to state 113
+    TLT      shift, and go to state 114
+    TGE      shift, and go to state 115
+    TLE      shift, and go to state 116
+    TPLUS    shift, and go to state 88
+    TMINUS   shift, and go to state 89
+    TMULT    shift, and go to state 90
+    TDIV     shift, and go to state 91
+
+    arithOp  go to state 92
+    compare  go to state 117
+
+
+state 109
+
+   77 condition: condition . TAND condition
+   78          | condition . TOR condition
+   80          | TLPAREN condition . TRPAREN
+
+    TRPAREN  shift, and go to state 137
+    TAND     shift, and go to state 119
+    TOR      shift, and go to state 120
+
+
+state 110
+
+   77 condition: condition . TAND condition
+   78          | condition . TOR condition
+   79          | TNOT condition .
+
+    TAND  shift, and go to state 119
+    TOR   shift, and go to state 120
+
+    TAND      [reduce using rule 79 (condition)]
+    TOR       [reduce using rule 79 (condition)]
+    $default  reduce using rule 79 (condition)
+
+
+state 111
+
+   84 compare: TEQ .
+
+    $default  reduce using rule 84 (compare)
+
+
+state 112
+
+   85 compare: TNEQ .
+
+    $default  reduce using rule 85 (compare)
+
+
+state 113
+
+   86 compare: TGT .
+
+    $default  reduce using rule 86 (compare)
+
+
+state 114
+
+   87 compare: TLT .
+
+    $default  reduce using rule 87 (compare)
+
+
+state 115
+
+   88 compare: TGE .
+
+    $default  reduce using rule 88 (compare)
+
+
+state 116
+
+   89 compare: TLE .
+
+    $default  reduce using rule 89 (compare)
+
+
+state 117
+
+   83 comparison: expr compare . expr
+
+    TLPAREN    shift, and go to state 58
+    TPLUSPLUS  shift, and go to state 32
+    TID        shift, and go to state 36
+    TNUM       shift, and go to state 59
+
+    increment     go to state 60
+    leftPartExpr  go to state 61
+    expr          go to state 138
+    term          go to state 63
+    funCall       go to state 64
+
+
+state 118
+
+   72 conditional: TIF TLPAREN condition TRPAREN . body elseBlock
+
+    TLBRACE  shift, and go to state 23
+
+    body  go to state 139
+
+
+state 119
+
+   77 condition: condition TAND . condition
+
+    TLPAREN    shift, and go to state 76
+    TPLUSPLUS  shift, and go to state 32
+    TNOT       shift, and go to state 77
+    TID        shift, and go to state 36
+    TNUM       shift, and go to state 59
+
+    increment     go to state 60
+    leftPartExpr  go to state 78
+    expr          go to state 79
+    term          go to state 63
+    funCall       go to state 80
+    condition     go to state 140
+    comparison    go to state 82
+
+
+state 120
+
+   78 condition: condition TOR . condition
+
+    TLPAREN    shift, and go to state 76
+    TPLUSPLUS  shift, and go to state 32
+    TNOT       shift, and go to state 77
+    TID        shift, and go to state 36
+    TNUM       shift, and go to state 59
+
+    increment     go to state 60
+    leftPartExpr  go to state 78
+    expr          go to state 79
+    term          go to state 63
+    funCall       go to state 80
+    condition     go to state 141
+    comparison    go to state 82
+
+
+state 121
+
+   91 whileHeader: TWHILE TLPAREN condition TRPAREN .
+
+    $default  reduce using rule 91 (whileHeader)
+
+
+state 122
+
+   93 forInit: varDecl TSEMICOLON . condition TSEMICOLON expr
+
+    TLPAREN    shift, and go to state 76
+    TPLUSPLUS  shift, and go to state 32
+    TNOT       shift, and go to state 77
+    TID        shift, and go to state 36
+    TNUM       shift, and go to state 59
+
+    increment     go to state 60
+    leftPartExpr  go to state 78
+    expr          go to state 79
+    term          go to state 63
+    funCall       go to state 80
+    condition     go to state 142
+    comparison    go to state 82
+
+
+state 123
+
+   92 forLoop: TFOR TLPAREN forInit TRPAREN . bodyOrSemi
+
+    TLBRACE     shift, and go to state 23
+    TSEMICOLON  shift, and go to state 24
+
+    body        go to state 25
+    bodyOrSemi  go to state 143
+
+
+state 124
+
+   55 expr: TLPAREN expr TRPAREN .
+
+    $default  reduce using rule 55 (expr)
+
+
+state 125
+
+   54 expr: expr . arithOp expr
+   54     | expr arithOp expr .
+
+    TPLUS   shift, and go to state 88
+    TMINUS  shift, and go to state 89
+    TMULT   shift, and go to state 90
+    TDIV    shift, and go to state 91
+
+    TPLUS     [reduce using rule 54 (expr)]
+    TMINUS    [reduce using rule 54 (expr)]
+    TMULT     [reduce using rule 54 (expr)]
+    TDIV      [reduce using rule 54 (expr)]
+    $default  reduce using rule 54 (expr)
+
+    arithOp  go to state 92
+
+
+state 126
+
+   51 arrayItem: arrayConst .
+
+    $default  reduce using rule 51 (arrayItem)
+
+
+state 127
+
+   48 arrayConst: TLBRACE arrayItems . TRBRACE
+
+    TRBRACE  shift, and go to state 144
+
+
+state 128
+
+   49 arrayItems: arrayItem . otherArrayItems
+
+    TCOMMA  shift, and go to state 145
+
+    $default  reduce using rule 53 (otherArrayItems)
+
+    otherArrayItems  go to state 146
+
+
+state 129
+
+   50 arrayItem: expr .
+   54 expr: expr . arithOp expr
+
+    TPLUS   shift, and go to state 88
+    TMINUS  shift, and go to state 89
+    TMULT   shift, and go to state 90
+    TDIV    shift, and go to state 91
+
+    $default  reduce using rule 50 (arrayItem)
+
+    arithOp  go to state 92
+
+
+state 130
+
+   69 otherParams: TCOMMA . paramList
+
+    TLPAREN      shift, and go to state 76
+    TLBRACE      shift, and go to state 93
+    TPLUSPLUS    shift, and go to state 32
+    TNOT         shift, and go to state 77
+    TSTRING_LIT  shift, and go to state 94
+    TCHAR_LIT    shift, and go to state 95
+    TID          shift, and go to state 36
+    TNUM         shift, and go to state 59
+
+    increment      go to state 60
+    rightPartExpr  go to state 96
+    leftPartExpr   go to state 78
+    arrayConst     go to state 97
+    expr           go to state 98
+    term           go to state 63
+    funCall        go to state 80
+    paramList      go to state 147
+    condition      go to state 100
+    comparison     go to state 82
+
+
+state 131
+
+   68 paramList: rightPartExpr otherParams .
+
+    $default  reduce using rule 68 (paramList)
+
+
+state 132
+
+   67 funCall: TID TLPAREN paramList TRPAREN .
+
+    $default  reduce using rule 67 (funCall)
+
+
+state 133
+
+   65 indexing: TLBRACKET dim TRBRACKET . indexing
+
+    TLBRACKET  shift, and go to state 67
+
+    $default  reduce using rule 66 (indexing)
+
+    indexing  go to state 148
+
+
+state 134
+
+   36 arrayDim: TLBRACKET dim . TRBRACKET arrayDim
+
+    TRBRACKET  shift, and go to state 149
+
+
+state 135
+
+   40 init: TASG . rightPartExpr
+
+    TLPAREN      shift, and go to state 76
+    TLBRACE      shift, and go to state 93
+    TPLUSPLUS    shift, and go to state 32
+    TNOT         shift, and go to state 77
+    TSTRING_LIT  shift, and go to state 94
+    TCHAR_LIT    shift, and go to state 95
+    TID          shift, and go to state 36
+    TNUM         shift, and go to state 59
+
+    increment      go to state 60
+    rightPartExpr  go to state 150
+    leftPartExpr   go to state 78
+    arrayConst     go to state 97
+    expr           go to state 98
+    term           go to state 63
+    funCall        go to state 80
+    condition      go to state 100
+    comparison     go to state 82
+
+
+state 136
+
+   35 varDecl: typeId TID arrayDim init .
+
+    $default  reduce using rule 35 (varDecl)
+
+
+state 137
+
+   80 condition: TLPAREN condition TRPAREN .
+
+    $default  reduce using rule 80 (condition)
+
+
+state 138
+
+   54 expr: expr . arithOp expr
+   83 comparison: expr compare expr .
+
+    TPLUS   shift, and go to state 88
+    TMINUS  shift, and go to state 89
+    TMULT   shift, and go to state 90
+    TDIV    shift, and go to state 91
+
+    $default  reduce using rule 83 (comparison)
+
+    arithOp  go to state 92
+
+
+state 139
+
+   72 conditional: TIF TLPAREN condition TRPAREN body . elseBlock
+
+    TELSE  shift, and go to state 151
+    TELIF  shift, and go to state 152
+
+    $default  reduce using rule 75 (elseBlock)
+
+    elseBlock  go to state 153
+
+
+state 140
+
+   77 condition: condition . TAND condition
+   77          | condition TAND condition .
+   78          | condition . TOR condition
+
+    TAND  shift, and go to state 119
+    TOR   shift, and go to state 120
+
+    TAND      [reduce using rule 77 (condition)]
+    TOR       [reduce using rule 77 (condition)]
+    $default  reduce using rule 77 (condition)
+
+
+state 141
+
+   77 condition: condition . TAND condition
+   78          | condition . TOR condition
+   78          | condition TOR condition .
+
+    TAND  shift, and go to state 119
+    TOR   shift, and go to state 120
+
+    TAND      [reduce using rule 78 (condition)]
+    TOR       [reduce using rule 78 (condition)]
+    $default  reduce using rule 78 (condition)
+
+
+state 142
+
+   77 condition: condition . TAND condition
+   78          | condition . TOR condition
+   93 forInit: varDecl TSEMICOLON condition . TSEMICOLON expr
+
+    TSEMICOLON  shift, and go to state 154
+    TAND        shift, and go to state 119
+    TOR         shift, and go to state 120
+
+
+state 143
+
+   92 forLoop: TFOR TLPAREN forInit TRPAREN bodyOrSemi .
+
+    $default  reduce using rule 92 (forLoop)
+
+
+state 144
+
+   48 arrayConst: TLBRACE arrayItems TRBRACE .
+
+    $default  reduce using rule 48 (arrayConst)
+
+
+state 145
+
+   52 otherArrayItems: TCOMMA . arrayItems
+
+    TLPAREN    shift, and go to state 58
+    TLBRACE    shift, and go to state 93
+    TPLUSPLUS  shift, and go to state 32
+    TID        shift, and go to state 36
+    TNUM       shift, and go to state 59
+
+    increment     go to state 60
+    leftPartExpr  go to state 61
+    arrayConst    go to state 126
+    arrayItems    go to state 155
+    arrayItem     go to state 128
+    expr          go to state 129
+    term          go to state 63
+    funCall       go to state 64
+
+
+state 146
+
+   49 arrayItems: arrayItem otherArrayItems .
+
+    $default  reduce using rule 49 (arrayItems)
+
+
+state 147
+
+   69 otherParams: TCOMMA paramList .
+
+    $default  reduce using rule 69 (otherParams)
+
+
+state 148
+
+   65 indexing: TLBRACKET dim TRBRACKET indexing .
+
+    $default  reduce using rule 65 (indexing)
+
+
+state 149
+
+   36 arrayDim: TLBRACKET dim TRBRACKET . arrayDim
+
+    TLBRACKET  shift, and go to state 104
+
+    $default  reduce using rule 37 (arrayDim)
+
+    arrayDim  go to state 156
+
+
+state 150
+
+   40 init: TASG rightPartExpr .
+
+    $default  reduce using rule 40 (init)
+
+
+state 151
+
+   73 elseBlock: TELSE . body
+
+    TLBRACE  shift, and go to state 23
+
+    body  go to state 157
+
+
+state 152
+
+   74 elseBlock: TELIF . TLPAREN condition TRPAREN body elseBlock
+
+    TLPAREN  shift, and go to state 158
+
+
+state 153
+
+   72 conditional: TIF TLPAREN condition TRPAREN body elseBlock .
+
+    $default  reduce using rule 72 (conditional)
+
+
+state 154
+
+   93 forInit: varDecl TSEMICOLON condition TSEMICOLON . expr
+
+    TLPAREN    shift, and go to state 58
+    TPLUSPLUS  shift, and go to state 32
+    TID        shift, and go to state 36
+    TNUM       shift, and go to state 59
+
+    increment     go to state 60
+    leftPartExpr  go to state 61
+    expr          go to state 159
+    term          go to state 63
+    funCall       go to state 64
+
+
+state 155
+
+   52 otherArrayItems: TCOMMA arrayItems .
+
+    $default  reduce using rule 52 (otherArrayItems)
+
+
+state 156
+
+   36 arrayDim: TLBRACKET dim TRBRACKET arrayDim .
+
+    $default  reduce using rule 36 (arrayDim)
+
+
+state 157
+
+   73 elseBlock: TELSE body .
+
+    $default  reduce using rule 73 (elseBlock)
+
+
+state 158
+
+   74 elseBlock: TELIF TLPAREN . condition TRPAREN body elseBlock
+
+    TLPAREN    shift, and go to state 76
+    TPLUSPLUS  shift, and go to state 32
+    TNOT       shift, and go to state 77
+    TID        shift, and go to state 36
+    TNUM       shift, and go to state 59
+
+    increment     go to state 60
+    leftPartExpr  go to state 78
+    expr          go to state 79
+    term          go to state 63
+    funCall       go to state 80
+    condition     go to state 160
+    comparison    go to state 82
+
+
+state 159
+
+   54 expr: expr . arithOp expr
+   93 forInit: varDecl TSEMICOLON condition TSEMICOLON expr .
+
+    TPLUS   shift, and go to state 88
+    TMINUS  shift, and go to state 89
+    TMULT   shift, and go to state 90
+    TDIV    shift, and go to state 91
+
+    $default  reduce using rule 93 (forInit)
+
+    arithOp  go to state 92
+
+
+state 160
+
+   74 elseBlock: TELIF TLPAREN condition . TRPAREN body elseBlock
+   77 condition: condition . TAND condition
+   78          | condition . TOR condition
+
+    TRPAREN  shift, and go to state 161
+    TAND     shift, and go to state 119
+    TOR      shift, and go to state 120
+
+
+state 161
+
+   74 elseBlock: TELIF TLPAREN condition TRPAREN . body elseBlock
+
+    TLBRACE  shift, and go to state 23
+
+    body  go to state 162
+
+
+state 162
+
+   74 elseBlock: TELIF TLPAREN condition TRPAREN body . elseBlock
+
+    TELSE  shift, and go to state 151
+    TELIF  shift, and go to state 152
+
+    $default  reduce using rule 75 (elseBlock)
+
+    elseBlock  go to state 163
+
+
+state 163
+
+   74 elseBlock: TELIF TLPAREN condition TRPAREN body elseBlock .
+
+    $default  reduce using rule 74 (elseBlock)
