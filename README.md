@@ -10,11 +10,11 @@ UML folder is not up to date
 Should compile sublanguage of C with type restrictions.
 
 **Basic types availble only:**
-  *int
-  *bool
-  *char
-  *float
-  *string
+  * int
+  * bool
+  * char
+  * float
+  * string
   
 Also there is support for the arrays of aforementioned types,
 functions, returning single values of supported types,
