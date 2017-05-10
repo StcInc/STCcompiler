@@ -1,7 +1,7 @@
 # STCcompiler
 
 
-## Strictly typed C compiler ## 
+## Strictly Typed C compiler ## 
 
 UML folder is not up to date
 
