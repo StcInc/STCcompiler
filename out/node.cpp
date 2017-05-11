@@ -19,6 +19,22 @@ enum Type {
     T_STRING
 };
 
+enum Commands {
+    C_NOOP, // for non comands
+    C_ASG,
+    C_VARDECL,
+    C_IF,
+    C_FOR,
+    C_WHILE,
+    C_POST,
+    C_FCALL,
+    C_RETURN,
+    C_BREAK,
+    C_CONTINUE,
+    C_INC,
+    C_BLOCK
+};
+
 
 class ArgList;
 class Arg;
@@ -108,15 +124,13 @@ public:
         }
     }
 
-    virtual void flatten() = 0;
-
-    // virtual void exec() = 0;
-
     void addChild(Node * child) {
         children.push_back(child);
     }
 
     virtual std::string getClassName() = 0;
+    virtual Commands getCommand () = 0;
+    virtual void flatten() = 0;
 
 };
 
@@ -132,6 +146,10 @@ public:
 
     std::string getClassName() {
         return "ArrayDim";
+    }
+
+    Commands getCommand () {
+        return C_NOOP;
     }
 
     void flatten() {
@@ -176,6 +194,10 @@ public:
         return "OtherDeclarations";
     }
 
+    Commands getCommand () {
+        return C_NOOP;
+    }
+
     void flatten() {
         // will be flattened in Program call
     }
@@ -218,6 +240,10 @@ public:
         return "TypeNode";
     }
 
+    Commands getCommand () {
+        return C_NOOP;
+    }
+
     void flatten() {
     }
 };
@@ -233,8 +259,8 @@ public:
     }
 
     virtual std::string getClassName() = 0;
-
-    void flatten() = 0;
+    virtual Commands getCommand () = 0;
+    virtual void flatten() = 0;
 };
 
 class Break : public Command {
@@ -249,6 +275,12 @@ public:
     std::string getClassName() {
         return "Break";
     }
+
+    Commands getCommand () {
+        return C_BREAK;
+    }
+
+
     void flatten() {
     }
 };
@@ -266,6 +298,10 @@ public:
         return "Continue";
     }
 
+    Commands getCommand () {
+        return C_CONTINUE;
+    }
+
     void flatten() {
     }
 };
@@ -281,8 +317,8 @@ public:
     }
 
     virtual std::string getClassName() = 0;
-
-    void flatten() = 0;
+    virtual Commands getCommand () = 0;
+    virtual void flatten() = 0;
 };
 
 class Program : public Node { // [Declaration, Program]
@@ -297,6 +333,10 @@ public:
 
     std::string getClassName() {
         return "Program";
+    }
+
+    Commands getCommand () {
+        return C_NOOP;
     }
 
     void flatten() {
@@ -341,6 +381,10 @@ public:
         return "ArrayItems";
     }
 
+    Commands getCommand () {
+        return C_NOOP;
+    }
+
     void flatten() {
         if (this->children[0]) {
             this->children[0]->flatten();
@@ -380,6 +424,11 @@ public:
     std::string getClassName() {
         return "Indexing";
     }
+
+    Commands getCommand () {
+        return C_NOOP;
+    }
+
     void flatten() {
         if (this->children[0]) {
             this->children[0]->flatten(); // expression in brackets
@@ -422,6 +471,11 @@ public:
     std::string getClassName() {
         return "LeftPartExpr";
     }
+
+    Commands getCommand () {
+        return C_NOOP;
+    }
+
     void flatten() {
         Indexing * iter = (Indexing *) this->children[1];
         Indexing * tmp;
@@ -449,6 +503,11 @@ public:
     std::string getClassName() {
         return "ArgList";
     }
+
+    Commands getCommand () {
+        return C_NOOP;
+    }
+
     void flatten() {
         if (this->children[0]) {
             this->children[0]->flatten();
@@ -489,6 +548,10 @@ public:
         return "Arg";
     }
 
+    Commands getCommand () {
+        return C_NOOP;
+    }
+
     void flatten() {
     }
 };
@@ -505,6 +568,10 @@ public:
 
     std::string getClassName() {
         return "ParamList";
+    }
+
+    Commands getCommand () {
+        return C_NOOP;
     }
 
     void flatten() {
@@ -546,6 +613,11 @@ public:
     std::string getClassName() {
         return "Assignment";
     }
+
+    Commands getCommand () {
+        return C_ASG;
+    }
+
     void flatten() {
         if (this->children[0]) {
             this->children[0]->flatten(); // LeftPartExpr
@@ -575,6 +647,10 @@ public:
 
     std::string getClassName() {
         return "Conditional";
+    }
+
+    Commands getCommand () {
+        return C_IF;
     }
 
     void flatten() {
@@ -610,7 +686,8 @@ public:
     }
 
     virtual std::string getClassName() = 0;
-    void flatten() = 0;
+    virtual Commands getCommand () = 0;
+    virtual void flatten() = 0;
 };
 
 
@@ -625,8 +702,8 @@ public:
     }
 
     virtual std::string getClassName() = 0;
-
-    void flatten() = 0;
+    virtual Commands getCommand () = 0;
+    virtual void flatten() = 0;
 };
 
 class BinaryExpr: public Expression { // [Expression, Expression]
@@ -641,6 +718,11 @@ public:
     std::string getClassName() {
         return "BinaryExpr";
     }
+
+    Commands getCommand () {
+        return C_NOOP;
+    }
+
     void flatten() {
         if (this->children[0]) {
             this->children[0]->flatten(); // Expression
@@ -671,6 +753,11 @@ public:
     std::string getClassName() {
         return "ForLoop";
     }
+
+    Commands getCommand () {
+        return C_FOR;
+    }
+
     void flatten() {
         if (this->children[0]) {
             this->children[0]->flatten(); // ForInit
@@ -700,6 +787,11 @@ public:
     std::string getClassName() {
         return "ForInit";
     }
+
+    Commands getCommand () {
+        return C_NOOP;
+    }
+
     void flatten() {
         if (this->children[0]) {
             this->children[0]->flatten(); // VariableDecl
@@ -737,6 +829,10 @@ public:
         return "PostLoop";
     }
 
+    Commands getCommand () {
+        return C_POST;
+    }
+
     void flatten() {
         if (this->children[0]) {
             this->children[0]->flatten(); // OperatorBlock
@@ -766,6 +862,10 @@ public:
         return "FunctionCall";
     }
 
+    Commands getCommand () {
+        return C_FCALL;
+    }
+
     void flatten() {
         if (this->children[1]) {
             this->children[1]->flatten(); // ParamList
@@ -787,6 +887,10 @@ public:
     }
     std::string getClassName() {
         return "FunctionDecl";
+    }
+
+    Commands getCommand () {
+        return C_NOOP;
     }
 
     void flatten() {
@@ -817,6 +921,10 @@ public:
         return "Identifier";
     }
 
+    Commands getCommand () {
+        return C_NOOP;
+    }
+
     void flatten() {
     }
 };
@@ -835,6 +943,10 @@ public:
         return "Literal";
     }
 
+    Commands getCommand () {
+        return C_NOOP;
+    }
+
     void flatten() {
     }
 };
@@ -851,6 +963,11 @@ public:
     std::string getClassName() {
         return "Increment";
     }
+
+    Commands getCommand () {
+        return C_INC;
+    }
+
     void flatten() {
         if (this->children[0]) {
             this->children[0]->flatten(); // LeftPartExpr
@@ -873,6 +990,10 @@ public:
     }
     std::string getClassName() {
         return "OperatorBlock";
+    }
+
+    Commands getCommand () {
+        return C_BLOCK;
     }
 
     void flatten() {
@@ -903,7 +1024,7 @@ public:
 
 
 
-class Return: public Command {
+class Return: public Command { // [Expression]
 public:
     Return () {
 
@@ -915,6 +1036,10 @@ public:
 
     std::string getClassName() {
         return "Return";
+    }
+
+    Commands getCommand () {
+        return C_RETURN;
     }
 
     void flatten() {
@@ -941,6 +1066,10 @@ public:
         return "UnaryExpr";
     }
 
+    Commands getCommand () {
+        return C_NOOP;
+    }
+
     void flatten() {
         if (this->children[0]) {
             this->children[0]->flatten(); //can be expression or Condition
@@ -964,6 +1093,10 @@ public:
 
     std::string getClassName() {
         return "VariableDecl";
+    }
+
+    Commands getCommand () {
+        return C_VARDECL;
     }
 
     void flatten() {
@@ -992,6 +1125,10 @@ public:
 
     std::string getClassName() {
         return "WhileLoop";
+    }
+
+    Commands getCommand () {
+        return C_WHILE;
     }
 
     void flatten() {
