@@ -367,13 +367,13 @@ public:
 
 };
 
-class ArrayItems : public Node {
+class ArrayItems : public Expression {
 public:
     ArrayItems () {
 
     }
 
-    ArrayItems (NodeValue * nodeValue) : Node(nodeValue) {
+    ArrayItems (NodeValue * nodeValue) : Expression(nodeValue) {
 
     }
 
@@ -478,8 +478,8 @@ public:
 
     void flatten() {
         Indexing * iter = (Indexing *) this->children[1];
-        Indexing * tmp;
         this->children.pop_back();
+        Indexing * tmp;
         while (iter) {
             tmp = iter;
             this->children.push_back(iter->children[0]);

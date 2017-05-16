@@ -2,6 +2,7 @@
 
 #include <cstdio>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include "node.cpp"
 #include "nodevalue.h"
@@ -76,7 +77,8 @@ void yyerror(const char *s) { printf("ERROR: %sn", s); }
 %token WHITE_SPACE
 
 %token <stringVal> TID
-%token <stringVal> TNUM
+%token <intVal> TINTV
+%token <floatVal> TFLOATV
 
 %type <nodeVal> compare
 
@@ -95,9 +97,7 @@ void yyerror(const char *s) { printf("ERROR: %sn", s); }
 %type <node> increment
 %type <node> varDecl
 %type <node> arrayDim
-%type <node> dim
 %type <node> init
-%type <node> rightPartExpr
 %type <node> leftPartExpr
 %type <node> arrayConst
 %type <node> arrayItems
@@ -289,7 +289,7 @@ varDecl : typeId TID arrayDim init {
     }
     ;
 
-arrayDim : TLBRACKET dim TRBRACKET arrayDim {
+arrayDim : TLBRACKET expr TRBRACKET arrayDim {
         $$ = new ArrayDim();
         $$->addChild($2);
         $$->addChild($4);
@@ -299,37 +299,11 @@ arrayDim : TLBRACKET dim TRBRACKET arrayDim {
     }
     ;
 
-dim : TNUM {
-        // parse value from stringVal
-        $$ = new Literal(new StringValue($<stringVal>1));
-    }
-    | expr {
-        $$ = $1;
-    }
-    ;
-
-init : TASG rightPartExpr {
+init : TASG expr {
         $$ = $2;
     }
     | { /*EPS*/
         $$ = NULL;
-    }
-    ;
-
-rightPartExpr : expr {
-        $$ = $1;
-    }
-    | arrayConst {
-        $$ = $1;
-    }
-    | condition {
-        $$ = $1;
-    }
-    | TSTRING_LIT {
-        $$ = new Literal(new StringValue($<stringVal>1));
-    }
-    | TCHAR_LIT {
-        $$ = new Literal(new CharValue($<charVal>1));
     }
     ;
 
@@ -383,8 +357,13 @@ expr : expr arithOp expr {
 
 term : leftPartExpr { $$ = $1; }
     | funCall { $$ = $1; }
-    | TNUM { $$ = new Literal(new StringValue($<stringVal>1)); }
     | increment { $$ = $1; }
+    | arrayConst { $$ = $1; }
+    | condition { $$ = $1; }
+    | TINTV { $$ = new Literal(new IntValue($<stringVal>1)); }
+    | TFLOATV { $$ = new Literal(new FloatValue($<stringVal>1)); }
+    | TSTRING_LIT { $$ = new Literal(new StringValue($<stringVal>1)); }
+    | TCHAR_LIT { $$ = new Literal(new CharValue($<charVal>1)); }
     ;
 
 
@@ -394,7 +373,7 @@ arithOp : TPLUS { $$ = new BinOp(TTPLUS);}
     | TDIV { $$ = new BinOp(TTDIV);}
     ;
 
-indexing : TLBRACKET dim TRBRACKET indexing {
+indexing : TLBRACKET expr TRBRACKET indexing {
         $$ = new Indexing();
         $$->addChild($2);
         $$->addChild($4);
@@ -411,7 +390,7 @@ funCall : TID TLPAREN paramList TRPAREN {
     }
     ;
 
-paramList : rightPartExpr otherParams {
+paramList : expr otherParams {
         $$ = new ParamList();
         $$->addChild($1);
         $$->addChild($2);
@@ -426,7 +405,7 @@ otherParams : TCOMMA paramList {
     }
     ;
 
-assignment : leftPartExpr TASG rightPartExpr {
+assignment :  TASG expr {
         $$ = new Assignment();
         $$->addChild($1);
         $$->addChild($3);
@@ -475,12 +454,6 @@ condition : comparison {
     }
     | TLPAREN condition TRPAREN {
         $$ = $2;
-    }
-    | leftPartExpr {
-        $$ = $1;
-    }
-    | funCall {
-        $$ = $1;
     }
     ;
 

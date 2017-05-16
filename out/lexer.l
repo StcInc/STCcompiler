@@ -69,7 +69,8 @@ L [a-zA-Z]
 
 
 {L}({L}|{D})*   { PRINT_TOKEN; SAVE_TOKEN; return TID; }
-{D}+([,.]{D}+)? { PRINT_TOKEN; SAVE_TOKEN; return TNUM; }
+{D}+            { PRINT_TOKEN; SAVE_TOKEN; return TINTV; }
+{D}+([,.]{D}+)f { PRINT_TOKEN; SAVE_TOKEN; return TFLOATV; }
 
 .               { InvalidToken(); }
 

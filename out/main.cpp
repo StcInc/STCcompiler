@@ -1,6 +1,6 @@
 #include <iostream>
 #include "node.cpp"
-// #include "typechecker.cpp"
+#include "typechecker.cpp"
 
 extern Program* program;
 extern int yyparse();
@@ -11,13 +11,13 @@ int main() {
         program->flatten();
         program->print();
 
-        // TypeChecker typeChecker();
-        // if (typeChecker.typeCheck(program)) {
-        //     std::cout << "Type ckeck passed" << std::endl;
-        // }
-        // else {
-        //     std::cout << "Type ckeck failed" << std::endl;
-        // }
+        TypeChecker typeChecker;
+        if (typeChecker.typeCheck(program)) {
+            std::cout << "Type check passed" << std::endl;
+        }
+        else {
+            std::cout << "Type check failed" << std::endl;
+        }
 
         // TODO: add other semantics checks like break, continue inside loops, etc.
 

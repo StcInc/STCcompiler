@@ -1,6 +1,8 @@
 #ifndef NODE_VALUE_H
 #define NODE_VALUE_H
 
+#include <sstream>
+#include <string>
 
 enum TokenType {
     TTPLUS = 0,
@@ -16,6 +18,12 @@ enum TokenType {
     TTAND,
     TTOR,
     TTNOT
+};
+
+enum OpType {
+    TARITH_OP = 0,
+    TBOOL_OP,
+    TCOMP_OP
 };
 
 class NodeValue {
@@ -53,6 +61,11 @@ public:
         value = val;
     }
 
+    IntValue(std::string * s) {
+        std::istringstream iss(*s);
+        iss >> value;
+    }
+
     std::string getValue() {
         return std::to_string(value);
     }
@@ -71,6 +84,11 @@ public:
 
     FloatValue(double val) {
         value = val;
+    }
+
+    FloatValue(std::string * s) {
+        std::istringstream iss(*s);
+        iss >> value;
     }
 
     std::string getValue() {
@@ -156,6 +174,27 @@ public:
         }
     }
 
+    OpType getOpType() {
+        switch (tokenType) {
+            case TTEQ:    return TCOMP_OP;
+            case TTNEQ:   return TCOMP_OP;
+            case TTGT:    return TCOMP_OP;
+            case TTLT:    return TCOMP_OP;
+            case TTGE:    return TCOMP_OP;
+            case TTLE:    return TCOMP_OP;
+
+            case TTAND:   return TBOOL_OP;
+            case TTOR:    return TBOOL_OP;
+
+            case TTPLUS:  return TARITH_OP;
+            case TTMINUS: return TARITH_OP;
+            case TTMULT:  return TARITH_OP;
+            case TTDIV:   return TARITH_OP;
+
+            default:     return TARITH_OP;
+        }
+    }
+
     std::string getClassName() {
         return "BinOp";
     }
@@ -177,6 +216,14 @@ public:
             case TTNOT: return std::string("'not'");
             case TTMINUS: return std::string("'-u-'");
             default: return std::string("Not defined");
+        }
+    }
+
+    OpType getOpType() {
+        switch (tokenType) {
+            case TTNOT: return TBOOL_OP;
+            case TTMINUS: return TARITH_OP;
+            default: return TARITH_OP;
         }
     }
 
