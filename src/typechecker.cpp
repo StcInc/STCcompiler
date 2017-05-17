@@ -56,6 +56,7 @@ struct FunDescriptor {
 
     /* Function parameters */
     std::map<std::string, VarDescriptor * > params;
+    std::vector<int> paramTypeNums; /* keeps type nums of the parameters */
 
     FunDescriptor(int typeNum) : typeRecNum(typeNum), bodyDefined(false) {
 
@@ -271,7 +272,7 @@ public:
                         return desc->typeRecNum;
                     }
                     else { // parameters are incorrect
-                        std::cout << "Params for fun call are incorrect"
+                        std::cout << "Params for fun call are incorrect "
                                   << *funName
                                   << std::endl;
                         return -1;
@@ -359,6 +360,10 @@ public:
     }
 
     bool typeCheckFun(FunctionDecl * fun) { // fun : [type, name, args, body]
+        assert(fun->children.size() >= 2);
+        assert(fun->children[0]);
+        assert(fun->children[1]);
+
         std::string * name = ((StringValue *)fun->children[1]->value)->value;
         std::cout << "Type checking fun " << *name << std::endl;
 
@@ -389,9 +394,19 @@ public:
             return res;
         }
         else if (!it->second->bodyDefined) {
-            //TODO: implement
             // check the parameters to match the predefinition
-            return false;
+            FunDescriptor * descriptor = it->second;
+            TypeNode * typeNode = (TypeNode *) fun->children[0];
+            if (getTypeRecNum(typeNode->type) == descriptor->typeRecNum) {
+                // check parameters
+
+                // TODO: how to check argument order in descriptor
+
+                return true;
+            }
+            else { // predefined type doesn't match
+                return false;
+            }
         }
         else {
             std::cout << "Symbol already used:" << *name << std::endl;
@@ -423,6 +438,8 @@ public:
                 VarDescriptor * p = new VarDescriptor(typeNum);
                 p->isAssigned = true;
                 descriptor->params.insert(std::pair<std::string, VarDescriptor *>(*name, p));
+                descriptor->paramTypeNums.push_back(typeNum);
+
             } else {
                 std::cout << "Symbol "
                           << *name
@@ -540,14 +557,28 @@ public:
     }
 
     bool typeCheckParamsForFunCall(FunDescriptor * context, FunDescriptor * descriptor, ParamList * params) {
-        return true;
-    }
+        if (params->children.size() != descriptor->params.size()) {
+            std::cout << "Count of parameters given to function doesn't match count of params in declaration" << std::endl;
+            return false;
+        }
+        for (int i = 0; i < params->children.size(); ++i) {
+            Expression * param = (Expression *) params->children[i];
+            int typeNum = getTypeNumOfExpr(param, context);
 
-    bool typeCheckBlock(OperatorBlock * block, FunDescriptor * descriptor) {
+            if (typeNum < 0) {
+                std::cout << "Incorrect param type of " << i << std::endl;
+                return false;
+            }
+            if (typeNum != descriptor->paramTypeNums[i]) {
+                std::cout << "Type of parameter given to fun doesn't match wtih declaration" << std::endl;
+                return false;
+            }
+        }
         return true;
     }
 
     bool typeCheckAssignment(Assignment * asg, FunDescriptor * descriptor) {
+        std::cout << "checking assignment" << std::endl;
         assert(asg->children.size() == 2);
 
         assert(asg->children[0]);
@@ -567,6 +598,7 @@ public:
     }
 
     bool typeCheckVarDecl(VariableDecl * varDecl, FunDescriptor * descriptor, std::string * funName) {
+        std::cout << "checking var declaration" << std::endl;
         assert(varDecl->children.size() >= 2);
 
         assert(varDecl->children[0]);
@@ -623,7 +655,10 @@ public:
             // check initialization
             Expression * initExpr = (Expression*)varDecl->children[3];
             int typeR = getTypeNumOfExpr(initExpr, descriptor);
-            assert(typeR >= 0);
+            if (typeR < 0) {
+                std::cout << "Right part of expressions has incorrect type" << std::endl;
+                return false;
+            }
 
             if (typeR != typeRecNum) {
                 std::cout << "Ivalid right part of assignment at variable declaration ";
@@ -641,6 +676,7 @@ public:
     }
 
     bool typeCheckIf(Conditional * conditional, FunDescriptor * descriptor, std::string * funName) {
+        std::cout << "checking if " << std::endl;
         assert(conditional->children.size() >= 2);
         assert(conditional->children[0]);
 
@@ -677,6 +713,7 @@ public:
     }
 
     bool typeCheckFor(ForLoop * loop, FunDescriptor * descriptor, std::string * funName) {
+        std::cout << "checking for loop" << std::endl;
         assert(loop->children.size() > 0);
         assert(loop->children[0]);
         ForInit * init = (ForInit *) loop->children[0];
@@ -728,6 +765,7 @@ public:
     }
 
     bool typeCheckWhile(WhileLoop * loop, FunDescriptor * descriptor, std::string * funName) {
+        std::cout << "checking while loop" << std::endl;
         assert(loop->children.size() > 0);
         assert(loop->children[0]);
         Expression * condition = (Expression * ) loop->children[0];
@@ -746,6 +784,7 @@ public:
     }
 
     bool typeCheckPost(PostLoop * loop, FunDescriptor * descriptor, std::string * funName) {
+        std::cout << "checking post cond loop" << std::endl;
         assert(loop->children.size() == 2);
         assert(loop->children[0]);
         assert(loop->children[1]);

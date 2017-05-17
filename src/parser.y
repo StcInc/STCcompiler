@@ -4,8 +4,8 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include "node.cpp"
-#include "nodevalue.h"
+#include "../src/node.cpp"
+#include "../src/nodevalue.h"
 
 
 Program * program;
@@ -405,7 +405,7 @@ otherParams : TCOMMA paramList {
     }
     ;
 
-assignment :  TASG expr {
+assignment : leftPartExpr TASG expr {
         $$ = new Assignment();
         $$->addChild($1);
         $$->addChild($3);

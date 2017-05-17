@@ -4,6 +4,7 @@ int sum (int x, int y) {
 
 int main () {
     int a = 20;
+    char c = sum('a', sum(a, a));
     for (int i = 0; i < 20; ++i) {
         if (i < a) {
             a = a - 1;
