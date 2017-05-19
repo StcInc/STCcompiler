@@ -56,7 +56,8 @@ struct FunDescriptor {
 
     /* Function parameters */
     std::map<std::string, VarDescriptor * > params;
-    std::vector<int> paramTypeNums; /* keeps type nums of the parameters */
+    std::vector<VarDescriptor *> paramOrdered; /* keeps ordering of function args */
+
 
     FunDescriptor(int typeNum) : typeRecNum(typeNum), bodyDefined(false) {
 
@@ -193,7 +194,7 @@ public:
         returns the number of record in types table, or -1 if check fails
      */
     int getTypeNumOfExpr(Expression * expr, FunDescriptor * descriptor) {
-        std::cout << "Checking expression: " << expr->getClassName() << '\n';
+        std::cout << "    Checking expression: " << expr->getClassName() << '\n';
         if (expr->getClassName() == "BinaryExpr") {
             assert(expr->children.size() == 2);
 
@@ -369,7 +370,7 @@ public:
 
         std::map<std::string, FunDescriptor *>::iterator it = funs.find(*name);
 
-        if (it == funs.end()) { // symbol is not tied, add to the table
+        if (it == funs.end()) { // symbol is not tied, add it to the table
             TypeNode * typeNode = (TypeNode*) fun->children[0];
             int typeNum = getTypeRecNum(typeNode->type);
             assert(typeNum >= 0);
@@ -383,28 +384,37 @@ public:
                 res = res && typeCheckFunctionArgs((ArgList*)fun->children[2], descriptor, name);
             }
 
+            // add sym to this->funs
+            funs.insert(std::pair<std::string, FunDescriptor * >(*name, descriptor));
+
             // check body
             if (fun->children.size() == 4 && fun->children[3]) {
                 res = res && typeCheckBody((OperatorBlock *)fun->children[3], descriptor, name);
+                if (res) {
+                    descriptor->bodyDefined = true;
+                }
             }
 
-            // add sym to this->funs
-            funs.insert(std::pair<std::string, FunDescriptor * >(*name, descriptor));
+
 
             return res;
         }
         else if (!it->second->bodyDefined) {
             // check the parameters to match the predefinition
             FunDescriptor * descriptor = it->second;
-            TypeNode * typeNode = (TypeNode *) fun->children[0];
-            if (getTypeRecNum(typeNode->type) == descriptor->typeRecNum) {
-                // check parameters
-
-                // TODO: how to check argument order in descriptor
-
-                return true;
+            if (typeMatchWithPredefinition(fun, descriptor, name)) {
+                bool res = true;
+                if (fun->children.size() == 4 && fun->children[3]) {
+                    OperatorBlock * body = (OperatorBlock *)fun->children[3];
+                    res = res && typeCheckBody(body, descriptor, name);
+                    descriptor->bodyDefined = res;
+                }
+                return res;
             }
-            else { // predefined type doesn't match
+            else { // types does not match
+                std::cout << "Param types does not match with predefinition "
+                          << *name
+                          << std::endl;
                 return false;
             }
         }
@@ -412,12 +422,14 @@ public:
             std::cout << "Symbol already used:" << *name << std::endl;
             return false;
         }
+        std::cout << " HERE !!!!!!!!!!!!!!" << std::endl;
+        return true;
     }
 
     /* Returns true if arguments in function declaration are defined correctly
     */
     bool typeCheckFunctionArgs(ArgList * args, FunDescriptor * descriptor, std::string * funName) {
-        std::cout << "checking fun args " << *funName << std::endl;
+        std::cout << "    Checking fun args " << *funName << std::endl;
 
         for (int i = 0; i < args->children.size(); ++i) {
             Arg * arg = (Arg*) args->children[i]; // [type, name]
@@ -438,8 +450,7 @@ public:
                 VarDescriptor * p = new VarDescriptor(typeNum);
                 p->isAssigned = true;
                 descriptor->params.insert(std::pair<std::string, VarDescriptor *>(*name, p));
-                descriptor->paramTypeNums.push_back(typeNum);
-
+                descriptor->paramOrdered.push_back(p);
             } else {
                 std::cout << "Symbol "
                           << *name
@@ -455,7 +466,7 @@ public:
     /* Returns true if all the operators in function body have type correctness
     */
     bool typeCheckBody(OperatorBlock * body, FunDescriptor * descriptor, std::string * funName) {
-        std::cout << "checking fun body " << *funName << std::endl;
+        std::cout << "    Checking fun body " << *funName << std::endl;
         bool res = true;
 
         for (int i = 0; i < body->children.size(); ++i) {
@@ -569,7 +580,7 @@ public:
                 std::cout << "Incorrect param type of " << i << std::endl;
                 return false;
             }
-            if (typeNum != descriptor->paramTypeNums[i]) {
+            if (typeNum != descriptor->paramOrdered[i]->typeRecNum) {
                 std::cout << "Type of parameter given to fun doesn't match wtih declaration" << std::endl;
                 return false;
             }
@@ -578,7 +589,7 @@ public:
     }
 
     bool typeCheckAssignment(Assignment * asg, FunDescriptor * descriptor) {
-        std::cout << "checking assignment" << std::endl;
+        std::cout << "    Checking assignment" << std::endl;
         assert(asg->children.size() == 2);
 
         assert(asg->children[0]);
@@ -598,7 +609,7 @@ public:
     }
 
     bool typeCheckVarDecl(VariableDecl * varDecl, FunDescriptor * descriptor, std::string * funName) {
-        std::cout << "checking var declaration" << std::endl;
+        std::cout << "    Checking var declaration" << std::endl;
         assert(varDecl->children.size() >= 2);
 
         assert(varDecl->children[0]);
@@ -676,7 +687,7 @@ public:
     }
 
     bool typeCheckIf(Conditional * conditional, FunDescriptor * descriptor, std::string * funName) {
-        std::cout << "checking if " << std::endl;
+        std::cout << "    Checking if " << std::endl;
         assert(conditional->children.size() >= 2);
         assert(conditional->children[0]);
 
@@ -713,7 +724,7 @@ public:
     }
 
     bool typeCheckFor(ForLoop * loop, FunDescriptor * descriptor, std::string * funName) {
-        std::cout << "checking for loop" << std::endl;
+        std::cout << "    Checking for loop" << std::endl;
         assert(loop->children.size() > 0);
         assert(loop->children[0]);
         ForInit * init = (ForInit *) loop->children[0];
@@ -725,10 +736,11 @@ public:
 
         // loop counter
         VariableDecl * varDecl = (VariableDecl *) init->children[0];
-        if (typeCheckVarDecl(varDecl, descriptor, funName)) {
+        if (!typeCheckVarDecl(varDecl, descriptor, funName)) {
             std::cout << "Variable declarations is type incorrect in "
                       << *funName
                       << std::endl;
+            return false;
         }
 
         // loop condition
@@ -765,7 +777,7 @@ public:
     }
 
     bool typeCheckWhile(WhileLoop * loop, FunDescriptor * descriptor, std::string * funName) {
-        std::cout << "checking while loop" << std::endl;
+        std::cout << "    Сhecking while loop" << std::endl;
         assert(loop->children.size() > 0);
         assert(loop->children[0]);
         Expression * condition = (Expression * ) loop->children[0];
@@ -784,7 +796,7 @@ public:
     }
 
     bool typeCheckPost(PostLoop * loop, FunDescriptor * descriptor, std::string * funName) {
-        std::cout << "checking post cond loop" << std::endl;
+        std::cout << "    Checking post cond loop" << std::endl;
         assert(loop->children.size() == 2);
         assert(loop->children[0]);
         assert(loop->children[1]);
@@ -808,14 +820,72 @@ public:
         return true;
     }
 
-    // TODO: add handlers for different commands
 
+    bool typeMatchWithPredefinition(FunctionDecl * fun, FunDescriptor * predef, std::string * funName) {
+        TypeNode * typeNode = (TypeNode *) fun->children[0];
+        if (getTypeRecNum(typeNode->type) == predef->typeRecNum) {
+            ArgList * args = (ArgList *) fun->children[2];
+            if (args->children.size() == predef->paramOrdered.size()) {
+                for (int i = 0; i < args->children.size(); ++i) {
+                    Arg * arg = (Arg *) args->children[i];
+                    assert(arg->children.size() == 2);
+                    assert(arg->children[0]);
+                    assert(arg->children[1]);
+
+                    TypeNode * typeNode = (TypeNode*) arg->children[0];
+                    Identifier * id = (Identifier *) arg->children[1];
+                    std::string * argName = ((StringValue*) id->value)->value;
+
+                    VarDescriptor * predefParam = predef->paramOrdered[i];
+                    int predefinedType = predefParam->typeRecNum;
+
+                    if (getTypeRecNum(typeNode->type) != predefinedType) {
+                        std::cout << "Param type does not match predefined "
+                                  << *argName
+                                  << std::endl;
+                        return false;
+                    }
+                    std::string foundName;
+                    std::map<std::string, VarDescriptor *>::iterator it;
+                    for (it = predef->params.begin(); it != predef->params.end(); ++it) {
+                        if (it->second == predefParam) {
+                            foundName = it->first;
+                        }
+                    }
+                    if (foundName.size() && *argName != foundName) {
+                        std::cout << "Arg name "
+                        << *argName
+                        << " does not match with name "
+                        << foundName
+                        << " in predefinition"
+                        << std::endl;
+                        return false;
+                    }
+                    else {
+                        std::cout << "Could not match param with it's name "
+                        << *argName
+                        << std::endl;
+                        return false;
+                    }
+                }
+            }
+            else {
+                std::cout << "Args count in predefinition does not match in further declaration "
+                          << *funName
+                          << std::endl;
+                return false;
+            }
+        }
+        else { // predefined return type doesn't match
+            std::cout << "Predefined fun return tupe does not match with further defined "
+                      << *funName
+                      << std::endl;
+            return false;
+        }
+        return true;
+    }
 
 };
 
 
 #endif // TYPE_H
-
-// int main() {
-//
-// }

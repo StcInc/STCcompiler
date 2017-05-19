@@ -4,7 +4,8 @@
 #include "../src/node.cpp"
 #include "parser.hpp"
 #define SAVE_TOKEN yylval.stringVal = new std::string(yytext, yyleng)
-#define PRINT_TOKEN {std::string * s = new std::string(yytext, yyleng); std::cout << "Lexer:recognized:" << *s << std::endl; delete s;}
+//#define PRINT_TOKEN {std::string * s = new std::string(yytext, yyleng); std::cout << "Lexer:recognized:" << *s << std::endl; delete s;}
+#define PRINT_TOKEN ;
 #define TOKEN(t) (yylval.token = t)
 void extern yyerror(char*);
 void InvalidToken();

@@ -2,9 +2,16 @@ int sum (int x, int y) {
     return x + y;
 }
 
+int f(int a) {
+    if (a == 0) {
+        return 1;
+    }
+    return a*f(a-1);
+}
+
 int main () {
     int a = 20;
-    char c = sum('a', sum(a, a));
+    int b = f(3);
     for (int i = 0; i < 20; ++i) {
         if (i < a) {
             a = a - 1;
