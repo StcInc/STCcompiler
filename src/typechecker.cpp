@@ -99,7 +99,8 @@ public:
     }
 
     ~TypeChecker () {
-        for (std::map<std::string, FunDescriptor *>::iterator it = funs.begin(); it != funs.end(); ++it) {
+        std::map<std::string, FunDescriptor *>::iterator it;
+        for (it = funs.begin(); it != funs.end(); ++it) {
             delete it->second;
         }
 
@@ -128,7 +129,7 @@ public:
      * returns number of type descriptor in types table (typeRecNum)
      * or -1, if not found
      */
-    int findArrayTypeId(Type type, int arrayLength, std::vector<int> dimensions) {
+    int findArrayTypeId(Type type, int arrayLength, std::vector<int>& dimensions) {
         TypeRec * t;
         for (int i = 0; i < types.size(); ++i) {
             t = types[i];
@@ -200,11 +201,21 @@ public:
 
             assert(expr->children[0]);
             int typeL = getTypeNumOfExpr((Expression*) expr->children[0], descriptor);
-            assert(typeL >= 0);
+            if (typeL < 0) {
+                std::cout << "Left part of binary expression has incorrect type ";
+                expr->print();
+                std::cout << std::endl;
+                return -1;
+            }
 
             assert(expr->children[1]);
             int typeR = getTypeNumOfExpr((Expression*) expr->children[1], descriptor);
-            assert(typeR >= 0);
+            if (typeR < 0) {
+                std::cout << "Right part of expression has incorrect type ";
+                expr->print();
+                std::cout << std::endl;
+                return -1;
+            }
 
             return getBinaryOpType((BinOp *)expr->value, typeL, typeR);
         }
@@ -328,7 +339,14 @@ public:
             Expression * dimen = (Expression*)incExp->children[i];
             if (dimen) {
                 int dimenType = getTypeNumOfExpr(dimen, descriptor);
-                assert(dimenType >= 0);
+                if (dimenType < 0) {
+                    std::cout << "Dimension expression has incorrect type in "
+                              << i
+                              << " of ";
+                    incExp->print();
+                    std::cout << std::endl;
+                    return -1;
+                }
                 if (dimenType != getTypeRecNum(T_INT)) {
                     std::cout << "Array dimensions must be integer values ";
                     incExp->print();
@@ -373,7 +391,12 @@ public:
         if (it == funs.end()) { // symbol is not tied, add it to the table
             TypeNode * typeNode = (TypeNode*) fun->children[0];
             int typeNum = getTypeRecNum(typeNode->type);
-            assert(typeNum >= 0);
+            if (typeNum < 0) {
+                std::cout << "Type node has incorrect type at ";
+                typeNode->print();
+                std::cout << std::endl;
+                return false;
+            }
 
             FunDescriptor * descriptor = new FunDescriptor(typeNum);
 
@@ -445,7 +468,18 @@ public:
                 TypeNode * typeNode = (TypeNode *) arg->children[0];
                 int typeNum = getTypeRecNum(typeNode->type);
 
-                assert(typeNum >= 0);
+                if (typeNum < 0) {
+                    std::cout << "Type node has incorrect type at function arg "
+                              << i
+                              << " of arglist of function "
+                              << *funName
+                              << std::endl;
+                    args->print();
+                    std::cout << std::endl;
+
+
+                    return false;
+                }
 
                 VarDescriptor * p = new VarDescriptor(typeNum);
                 p->isAssigned = true;
@@ -517,7 +551,12 @@ public:
                 case C_RETURN : {
                     if (command->children.size() > 0) {
                         int typeNum = getTypeNumOfExpr((Expression *)command->children[0], descriptor);
-                        assert(typeNum >= 0);
+                        if (typeNum < 0) {
+                            std::cout << "Returned expression has incorrect type at "
+                                      << *funName
+                                      << std::endl;
+                            res = false;
+                        }
                         if (typeNum != descriptor->typeRecNum) {
                             res = false;
                             std::cout << "Return expression type must match the function type "
@@ -595,12 +634,22 @@ public:
         assert(asg->children[0]);
         LeftPartExpr * leftPart = (LeftPartExpr*) asg->children[0];
         int leftTypeNum = getLeftPartExprTypeNum(leftPart, descriptor);
-        assert(leftTypeNum >= 0);
+        if (leftTypeNum < 0) {
+            std::cout << "Left part expression has incorrect type at assignment " << std::endl;
+            asg->print();
+            std::cout << std::endl;
+            return false;
+        }
 
         assert(asg->children[1]);
         Expression * rightPart = (Expression*) asg->children[1];
         int rightTypeNum = getTypeNumOfExpr(rightPart, descriptor);
-        assert(rightTypeNum >= 0);
+        if (rightTypeNum < 0) {
+            std::cout << "Right part expression has incorrect type at assignment " << std::endl;
+            asg->print();
+            std::cout << std::endl;
+            return false;
+        }
 
         if (leftTypeNum == rightTypeNum) {
             return true;
@@ -615,7 +664,12 @@ public:
         assert(varDecl->children[0]);
         TypeNode * typeNode = (TypeNode *) varDecl->children[0];
         int typeRecNum = getTypeRecNum(typeNode->type);
-        assert(typeRecNum >= 0);
+        if (typeRecNum < 0) {
+            std::cout << "Type node has unknown type: ";
+            typeNode->print();
+            std::cout << std::endl;
+            return false;
+        }
 
         assert(varDecl->children[1]);
         Identifier * id = (Identifier*) varDecl->children[1];
@@ -648,7 +702,14 @@ public:
                 Expression * dimen = (Expression*)dimensions->children[i];
                 if (dimen) {
                     dimenType = getTypeNumOfExpr(dimen, descriptor);
-                    assert(dimenType >= 0);
+                    if (dimenType < 0) {
+                        std::cout << "Dimension expression has incorrect type in "
+                                  << i
+                                  << " dimension of declaraion of "
+                                  << *name
+                                  << std::endl;
+                        return -1;
+                    }
 
                     if (dimenType != getTypeRecNum(T_INT)) {
                         std::cout << "Array dimensions must be integer values ";

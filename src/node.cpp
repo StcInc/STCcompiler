@@ -667,10 +667,7 @@ public:
             LOG(getClassName() + "->children[1] is null");
         }
         if (this->children[2]) {
-            this->children[2]->flatten(); // OperatorBlock or another Conditional object !!!!!!!!!
-        }
-        else {
-            LOG(getClassName() + "->children[2] is null");
+            this->children[2]->flatten(); // OperatorBlock or another Conditional object may be absent
         }
     }
 };
