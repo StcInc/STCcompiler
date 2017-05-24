@@ -1,4 +1,4 @@
-echo "Cleaning..."
+
 ./clean.sh
 
 echo "Compiling lexer..."

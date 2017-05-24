@@ -41,7 +41,7 @@ public:
     }
 
     void generate(Program * program) {
-        std::cout << "Generating code...\n";
+
 
         /* Create the top level interpreter function to call as entry */
         ArrayRef<llvm::Type*> argTypes;
@@ -57,12 +57,15 @@ public:
         ReturnInst::Create(context, bblock);
         popBlock();
 
-        std::cout << "Code is generated.\n";
-        std::cout << "=========CODE=========\n";
+
+
+    }
+
+    void printCode() {
+
         llvm::legacy::PassManager pm;
         pm.add(createPrintModulePass(outs()));
         pm.run(*module);
-
     }
 
     void pushBlock(BasicBlock *block) {

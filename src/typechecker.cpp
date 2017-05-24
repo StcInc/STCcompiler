@@ -1,6 +1,8 @@
 #ifndef TYPE_H
 #define TYPE_H
 
+// #define VERBOSE_TYPE_CHECKING_INFO
+
 #include <cassert>
 #include <string>
 #include <vector>
@@ -195,25 +197,32 @@ public:
         returns the number of record in types table, or -1 if check fails
      */
     int getTypeNumOfExpr(Expression * expr, FunDescriptor * descriptor) {
-        std::cout << "    Checking expression: " << expr->getClassName() << '\n';
+        #ifdef VERBOSE_TYPE_CHECKING_INFO
+            std::cout << "    Checking expression: " << expr->getClassName() << '\n';
+        #endif
+
         if (expr->getClassName() == "BinaryExpr") {
             assert(expr->children.size() == 2);
 
             assert(expr->children[0]);
             int typeL = getTypeNumOfExpr((Expression*) expr->children[0], descriptor);
             if (typeL < 0) {
-                std::cout << "Left part of binary expression has incorrect type ";
-                expr->print();
-                std::cout << std::endl;
+                #ifdef VERBOSE_TYPE_CHECKING_INFO
+                    std::cout << "Left part of binary expression has incorrect type ";
+                    expr->print();
+                    std::cout << std::endl;
+                #endif
                 return -1;
             }
 
             assert(expr->children[1]);
             int typeR = getTypeNumOfExpr((Expression*) expr->children[1], descriptor);
             if (typeR < 0) {
-                std::cout << "Right part of expression has incorrect type ";
-                expr->print();
-                std::cout << std::endl;
+                #ifdef VERBOSE_TYPE_CHECKING_INFO
+                    std::cout << "Right part of expression has incorrect type ";
+                    expr->print();
+                    std::cout << std::endl;
+                #endif
                 return -1;
             }
 
@@ -260,10 +269,11 @@ public:
 
             return -1;
         }
-
-        std::cout << "Fail to match expression type ";
-        expr->print();
-        std::cout << std::endl;
+        #ifdef VERBOSE_TYPE_CHECKING_INFO
+            std::cout << "Fail to match expression type ";
+            expr->print();
+            std::cout << std::endl;
+        #endif
         return -1; // fail to match expression type
     }
 
@@ -284,24 +294,30 @@ public:
                         return desc->typeRecNum;
                     }
                     else { // parameters are incorrect
-                        std::cout << "Params for fun call are incorrect "
-                                  << *funName
-                                  << std::endl;
+                        #ifdef VERBOSE_TYPE_CHECKING_INFO
+                            std::cout << "Params for fun call are incorrect "
+                                      << *funName
+                                      << std::endl;
+                        #endif
                         return -1;
                     }
                 }
                 else { // no params given, but expected
-                    std::cout << "No parameters given to function "
-                              << *funName
-                              << std::endl;
+                    #ifdef VERBOSE_TYPE_CHECKING_INFO
+                        std::cout << "No parameters given to function "
+                        << *funName
+                        << std::endl;
+                    #endif
                     return -1;
                 }
             }
             else { // no parameters expected for function call
                 if (expr->children.size() > 0) { // Unexpected parameters given
-                    std::cout << "Unexpected parameters given to function "
-                              << *funName
-                              << std::endl;
+                    #ifdef VERBOSE_TYPE_CHECKING_INFO
+                        std::cout << "Unexpected parameters given to function "
+                        << *funName
+                        << std::endl;
+                    #endif
                     return -1;
                 }
                 else { // no parameters given, no parameters expected
@@ -310,7 +326,9 @@ public:
             }
         }
         else { // function descriptor not found
-            std::cout << "Undefined function called: " << *funName;
+            #ifdef VERBOSE_TYPE_CHECKING_INFO
+                std::cout << "Undefined function called: " << *funName;
+            #endif
             return -1;
         }
     }
@@ -327,8 +345,10 @@ public:
         if (it == descriptor->env.end()) {
             it = descriptor->params.find(*name);
             if (it == descriptor->params.end()) {
-                std::cout << "Variable " << *name << " was not defined " << std::endl;
-                incExp->print();
+                #ifdef VERBOSE_TYPE_CHECKING_INFO
+                    std::cout << "Variable " << *name << " was not defined " << std::endl;
+                    incExp->print();
+                #endif
                 return -1;
             }
         }
@@ -340,16 +360,20 @@ public:
             if (dimen) {
                 int dimenType = getTypeNumOfExpr(dimen, descriptor);
                 if (dimenType < 0) {
-                    std::cout << "Dimension expression has incorrect type in "
-                              << i
-                              << " of ";
-                    incExp->print();
-                    std::cout << std::endl;
+                    #ifdef VERBOSE_TYPE_CHECKING_INFO
+                        std::cout << "Dimension expression has incorrect type in "
+                                  << i
+                                  << " of ";
+                        incExp->print();
+                        std::cout << std::endl;
+                    #endif
                     return -1;
                 }
                 if (dimenType != getTypeRecNum(T_INT)) {
-                    std::cout << "Array dimensions must be integer values ";
-                    incExp->print();
+                    #ifdef VERBOSE_TYPE_CHECKING_INFO
+                        std::cout << "Array dimensions must be integer values ";
+                        incExp->print();
+                    #endif
                     return -1;
                 }
             }
@@ -384,7 +408,9 @@ public:
         assert(fun->children[1]);
 
         std::string * name = ((StringValue *)fun->children[1]->value)->value;
-        std::cout << "Type checking fun " << *name << std::endl;
+        #ifdef VERBOSE_TYPE_CHECKING_INFO
+            std::cout << "Type checking fun " << *name << std::endl;
+        #endif
 
         std::map<std::string, FunDescriptor *>::iterator it = funs.find(*name);
 
@@ -392,9 +418,11 @@ public:
             TypeNode * typeNode = (TypeNode*) fun->children[0];
             int typeNum = getTypeRecNum(typeNode->type);
             if (typeNum < 0) {
-                std::cout << "Type node has incorrect type at ";
-                typeNode->print();
-                std::cout << std::endl;
+                #ifdef VERBOSE_TYPE_CHECKING_INFO
+                    std::cout << "Type node has incorrect type at ";
+                    typeNode->print();
+                    std::cout << std::endl;
+                #endif
                 return false;
             }
 
@@ -435,24 +463,29 @@ public:
                 return res;
             }
             else { // types does not match
-                std::cout << "Param types does not match with predefinition "
-                          << *name
-                          << std::endl;
+                #ifdef VERBOSE_TYPE_CHECKING_INFO
+                    std::cout << "Param types does not match with predefinition "
+                              << *name
+                              << std::endl;
+                #endif
                 return false;
             }
         }
         else {
-            std::cout << "Symbol already used:" << *name << std::endl;
+            #ifdef VERBOSE_TYPE_CHECKING_INFO
+                std::cout << "Symbol already used:" << *name << std::endl;
+            #endif
             return false;
         }
-        std::cout << " HERE !!!!!!!!!!!!!!" << std::endl;
         return true;
     }
 
     /* Returns true if arguments in function declaration are defined correctly
     */
     bool typeCheckFunctionArgs(ArgList * args, FunDescriptor * descriptor, std::string * funName) {
-        std::cout << "    Checking fun args " << *funName << std::endl;
+        #ifdef VERBOSE_TYPE_CHECKING_INFO
+            std::cout << "    Checking fun args " << *funName << std::endl;
+        #endif
 
         for (int i = 0; i < args->children.size(); ++i) {
             Arg * arg = (Arg*) args->children[i]; // [type, name]
@@ -469,15 +502,15 @@ public:
                 int typeNum = getTypeRecNum(typeNode->type);
 
                 if (typeNum < 0) {
-                    std::cout << "Type node has incorrect type at function arg "
-                              << i
-                              << " of arglist of function "
-                              << *funName
-                              << std::endl;
-                    args->print();
-                    std::cout << std::endl;
-
-
+                    #ifdef VERBOSE_TYPE_CHECKING_INFO
+                        std::cout << "Type node has incorrect type at function arg "
+                        << i
+                        << " of arglist of function "
+                        << *funName
+                        << std::endl;
+                        args->print();
+                        std::cout << std::endl;
+                    #endif
                     return false;
                 }
 
@@ -486,11 +519,13 @@ public:
                 descriptor->params.insert(std::pair<std::string, VarDescriptor *>(*name, p));
                 descriptor->paramOrdered.push_back(p);
             } else {
-                std::cout << "Symbol "
-                          << *name
-                          << " already used as parameter of function "
-                          << *funName
-                          << std::endl;
+                #ifdef VERBOSE_TYPE_CHECKING_INFO
+                    std::cout << "Symbol "
+                    << *name
+                    << " already used as parameter of function "
+                    << *funName
+                    << std::endl;
+                #endif
                 return false;
             }
         }
@@ -500,7 +535,9 @@ public:
     /* Returns true if all the operators in function body have type correctness
     */
     bool typeCheckBody(OperatorBlock * body, FunDescriptor * descriptor, std::string * funName) {
-        std::cout << "    Checking fun body " << *funName << std::endl;
+        #ifdef VERBOSE_TYPE_CHECKING_INFO
+            std::cout << "    Checking fun body " << *funName << std::endl;
+        #endif
         bool res = true;
 
         for (int i = 0; i < body->children.size(); ++i) {
@@ -539,12 +576,13 @@ public:
                     int typeNum = getFunCallTypeNum(call, descriptor);
                     if (typeNum >= 0) {
                         res = false;
-                        std::cout << "Function call is incorrect"
-                                  << *calledName
-                                  << " in "
-                                  << funName
-                                  << std::endl;
-
+                        #ifdef VERBOSE_TYPE_CHECKING_INFO
+                            std::cout << "Function call is incorrect"
+                            << *calledName
+                            << " in "
+                            << funName
+                            << std::endl;
+                        #endif
                     }
                     break;
                 }
@@ -552,24 +590,32 @@ public:
                     if (command->children.size() > 0) {
                         int typeNum = getTypeNumOfExpr((Expression *)command->children[0], descriptor);
                         if (typeNum < 0) {
-                            std::cout << "Returned expression has incorrect type at "
-                                      << *funName
-                                      << std::endl;
                             res = false;
+                            #ifdef VERBOSE_TYPE_CHECKING_INFO
+                                std::cout
+                                    << "Returned expression has incorrect type at "
+                                    << *funName
+                                    << std::endl;
+                            #endif
                         }
                         if (typeNum != descriptor->typeRecNum) {
                             res = false;
-                            std::cout << "Return expression type must match the function type "
-                                      << *funName
-                                      << std::endl;
+                            #ifdef VERBOSE_TYPE_CHECKING_INFO
+                                std::cout << "Return expression type must match the function type "
+                                << *funName
+                                << std::endl;
+                            #endif
+
                         } // else res depend on it's own
                     }
                     else { // return; - function's type had to be void
                         if (descriptor->typeRecNum != getTypeRecNum(T_VOID)) {
                             res = false;
-                            std::cout << "Function return type must be void to use return without expression "
-                                      << *funName
-                                      << std::endl;
+                            #ifdef VERBOSE_TYPE_CHECKING_INFO
+                                std::cout << "Function return type must be void to use return without expression "
+                                << *funName
+                                << std::endl;
+                            #endif
                         } // else res depend on it's own
                     }
                     break;
@@ -585,9 +631,12 @@ public:
                     int exprType = getTypeNumOfExpr(expr, descriptor);
                     if (exprType != getTypeRecNum(T_INT)) {
                         res = false;
-                        std::cout << "Incrementable value had to have type of int "
-                                  << *funName
-                                  << std::endl;
+                        #ifdef VERBOSE_TYPE_CHECKING_INFO
+                            std::cout
+                                << "Incrementable value had to have type of int "
+                                << *funName
+                                << std::endl;
+                        #endif
                     } // else res depend on it's own
                     break;
                 }
@@ -596,11 +645,15 @@ public:
                     res = res && typeCheckBody(block, descriptor, funName);
                     break;
                 }
-                default :
-                    std::cout << "Unexpected node type "
-                              << command->getClassName()
-                              << std::endl;
+                default : {
+                    res = false;
+                    #ifdef VERBOSE_TYPE_CHECKING_INFO
+                        std::cout << "Unexpected node type "
+                            << command->getClassName()
+                            << std::endl;
+                    #endif
                     break;
+                }
             }
         }
         return res;
@@ -608,7 +661,9 @@ public:
 
     bool typeCheckParamsForFunCall(FunDescriptor * context, FunDescriptor * descriptor, ParamList * params) {
         if (params->children.size() != descriptor->params.size()) {
-            std::cout << "Count of parameters given to function doesn't match count of params in declaration" << std::endl;
+            #ifdef VERBOSE_TYPE_CHECKING_INFO
+                std::cout << "Count of parameters given to function doesn't match count of params in declaration" << std::endl;
+            #endif
             return false;
         }
         for (int i = 0; i < params->children.size(); ++i) {
@@ -616,11 +671,15 @@ public:
             int typeNum = getTypeNumOfExpr(param, context);
 
             if (typeNum < 0) {
-                std::cout << "Incorrect param type of " << i << std::endl;
+                #ifdef VERBOSE_TYPE_CHECKING_INFO
+                    std::cout << "Incorrect param type of " << i << std::endl;
+                #endif
                 return false;
             }
             if (typeNum != descriptor->paramOrdered[i]->typeRecNum) {
-                std::cout << "Type of parameter given to fun doesn't match wtih declaration" << std::endl;
+                #ifdef VERBOSE_TYPE_CHECKING_INFO
+                    std::cout << "Type of parameter given to fun doesn't match wtih declaration" << std::endl;
+                #endif
                 return false;
             }
         }
@@ -628,16 +687,20 @@ public:
     }
 
     bool typeCheckAssignment(Assignment * asg, FunDescriptor * descriptor) {
-        std::cout << "    Checking assignment" << std::endl;
+        #ifdef VERBOSE_TYPE_CHECKING_INFO
+            std::cout << "    Checking assignment" << std::endl;
+        #endif
         assert(asg->children.size() == 2);
 
         assert(asg->children[0]);
         LeftPartExpr * leftPart = (LeftPartExpr*) asg->children[0];
         int leftTypeNum = getLeftPartExprTypeNum(leftPart, descriptor);
         if (leftTypeNum < 0) {
-            std::cout << "Left part expression has incorrect type at assignment " << std::endl;
-            asg->print();
-            std::cout << std::endl;
+            #ifdef VERBOSE_TYPE_CHECKING_INFO
+                std::cout << "Left part expression has incorrect type at assignment " << std::endl;
+                asg->print();
+                std::cout << std::endl;
+            #endif
             return false;
         }
 
@@ -645,9 +708,11 @@ public:
         Expression * rightPart = (Expression*) asg->children[1];
         int rightTypeNum = getTypeNumOfExpr(rightPart, descriptor);
         if (rightTypeNum < 0) {
-            std::cout << "Right part expression has incorrect type at assignment " << std::endl;
-            asg->print();
-            std::cout << std::endl;
+            #ifdef VERBOSE_TYPE_CHECKING_INFO
+                std::cout << "Right part expression has incorrect type at assignment " << std::endl;
+                asg->print();
+                std::cout << std::endl;
+            #endif
             return false;
         }
 
@@ -658,16 +723,20 @@ public:
     }
 
     bool typeCheckVarDecl(VariableDecl * varDecl, FunDescriptor * descriptor, std::string * funName) {
-        std::cout << "    Checking var declaration" << std::endl;
+        #ifdef VERBOSE_TYPE_CHECKING_INFO
+            std::cout << "    Checking var declaration" << std::endl;
+        #endif
         assert(varDecl->children.size() >= 2);
 
         assert(varDecl->children[0]);
         TypeNode * typeNode = (TypeNode *) varDecl->children[0];
         int typeRecNum = getTypeRecNum(typeNode->type);
         if (typeRecNum < 0) {
-            std::cout << "Type node has unknown type: ";
-            typeNode->print();
-            std::cout << std::endl;
+            #ifdef VERBOSE_TYPE_CHECKING_INFO
+                std::cout << "Type node has unknown type: ";
+                typeNode->print();
+                std::cout << std::endl;
+            #endif
             return false;
         }
 
@@ -680,12 +749,16 @@ public:
         if (it == descriptor->params.end()) {
             it = descriptor->env.find(*name);
             if (it != descriptor->env.end()) {
-                std::cout << "Variable already defined " << *name << std::endl;
+                #ifdef VERBOSE_TYPE_CHECKING_INFO
+                    std::cout << "Variable already defined " << *name << std::endl;
+                #endif
                 return false;
             }
         }
         else {
-            std::cout << "Attempting to override function parameter " << *name << std::endl;
+            #ifdef VERBOSE_TYPE_CHECKING_INFO
+                std::cout << "Attempting to override function parameter " << *name << std::endl;
+            #endif
             return false;
         }
 
@@ -703,18 +776,23 @@ public:
                 if (dimen) {
                     dimenType = getTypeNumOfExpr(dimen, descriptor);
                     if (dimenType < 0) {
-                        std::cout << "Dimension expression has incorrect type in "
-                                  << i
-                                  << " dimension of declaraion of "
-                                  << *name
-                                  << std::endl;
+                        #ifdef VERBOSE_TYPE_CHECKING_INFO
+                            std::cout
+                            << "Dimension expression has incorrect type in "
+                            << i
+                            << " dimension of declaraion of "
+                            << *name
+                            << std::endl;
+                        #endif
                         return -1;
                     }
 
                     if (dimenType != getTypeRecNum(T_INT)) {
-                        std::cout << "Array dimensions must be integer values ";
-                        varDecl->print();
-                        std::cout << std::endl;
+                        #ifdef VERBOSE_TYPE_CHECKING_INFO
+                            std::cout << "Array dimensions must be integer values ";
+                            varDecl->print();
+                            std::cout << std::endl;
+                        #endif
                         return -1;
                     }
                 }
@@ -728,14 +806,18 @@ public:
             Expression * initExpr = (Expression*)varDecl->children[3];
             int typeR = getTypeNumOfExpr(initExpr, descriptor);
             if (typeR < 0) {
-                std::cout << "Right part of expressions has incorrect type" << std::endl;
+                #ifdef VERBOSE_TYPE_CHECKING_INFO
+                    std::cout << "Right part of expressions has incorrect type" << std::endl;
+                #endif
                 return false;
             }
 
             if (typeR != typeRecNum) {
-                std::cout << "Ivalid right part of assignment at variable declaration ";
-                varDecl->print();
-                std::cout << std::endl;
+                #ifdef VERBOSE_TYPE_CHECKING_INFO
+                    std::cout << "Ivalid right part of assignment at variable declaration ";
+                    varDecl->print();
+                    std::cout << std::endl;
+                #endif
                 delete varDesc;
                 return false;
             }
@@ -748,14 +830,18 @@ public:
     }
 
     bool typeCheckIf(Conditional * conditional, FunDescriptor * descriptor, std::string * funName) {
-        std::cout << "    Checking if " << std::endl;
+        #ifdef VERBOSE_TYPE_CHECKING_INFO
+            std::cout << "    Checking if " << std::endl;
+        #endif
         assert(conditional->children.size() >= 2);
         assert(conditional->children[0]);
 
         Expression * condition = (Expression *) conditional->children[0];
         int typeCond = getTypeNumOfExpr(condition, descriptor);
         if (typeCond != getTypeRecNum(T_BOOL)) {
-            std::cout << "Condition in IF statement must have boolean type " << std::endl;
+            #ifdef VERBOSE_TYPE_CHECKING_INFO
+                std::cout << "Condition in IF statement must have boolean type " << std::endl;
+            #endif
             return false;
         }
 
@@ -764,7 +850,9 @@ public:
 
 
         if (!typeCheckBody(thenBranch, descriptor, funName)) {
-            std::cout << "Then branch in if is type incorrect" << std::endl;
+            #ifdef VERBOSE_TYPE_CHECKING_INFO
+                std::cout << "Then branch in if is type incorrect" << std::endl;
+            #endif
             return false;
         }
 
@@ -776,7 +864,9 @@ public:
                 return typeCheckBody((OperatorBlock *) conditional->children[2], descriptor, funName);
             }
             else {
-                std::cout << "Could not match the node type of else branch" << std::endl;
+                #ifdef VERBOSE_TYPE_CHECKING_INFO
+                    std::cout << "Could not match the node type of else branch" << std::endl;
+                #endif
                 return false;
             }
         }
@@ -785,7 +875,9 @@ public:
     }
 
     bool typeCheckFor(ForLoop * loop, FunDescriptor * descriptor, std::string * funName) {
-        std::cout << "    Checking for loop" << std::endl;
+        #ifdef VERBOSE_TYPE_CHECKING_INFO
+            std::cout << "    Checking for loop" << std::endl;
+        #endif
         assert(loop->children.size() > 0);
         assert(loop->children[0]);
         ForInit * init = (ForInit *) loop->children[0];
@@ -798,31 +890,39 @@ public:
         // loop counter
         VariableDecl * varDecl = (VariableDecl *) init->children[0];
         if (!typeCheckVarDecl(varDecl, descriptor, funName)) {
-            std::cout << "Variable declarations is type incorrect in "
-                      << *funName
-                      << std::endl;
+            #ifdef VERBOSE_TYPE_CHECKING_INFO
+                std::cout << "Variable declarations is type incorrect in "
+                          << *funName
+                          << std::endl;
+            #endif
             return false;
         }
 
         // loop condition
         if (getTypeNumOfExpr((Expression *) init->children[1], descriptor) != getTypeRecNum(T_BOOL)) {
-            std::cout << "Condition in FOR statement must have boolean type in "
-                      << *funName
-                      << std::endl;
+            #ifdef VERBOSE_TYPE_CHECKING_INFO
+                std::cout << "Condition in FOR statement must have boolean type in "
+                << *funName
+                << std::endl;
+            #endif
             return false;
         }
         // each operation
         if (getTypeNumOfExpr((Expression *) init->children[2], descriptor) < 0) {
-            std::cout << "Loop operation in FOR statement has incorrect type in "
-                      << *funName
-                      << std::endl;
+            #ifdef VERBOSE_TYPE_CHECKING_INFO
+                std::cout << "Loop operation in FOR statement has incorrect type in "
+                << *funName
+                << std::endl;
+            #endif
             return false;
         }
 
         if (loop->children.size() == 2 && loop->children[1]) { // body can be absent
             OperatorBlock * body = (OperatorBlock *) loop->children[1];
             if (!typeCheckBody(body, descriptor, funName)) {
-                std::cout << "For loop body has incorrect types in it" << std::endl;
+                #ifdef VERBOSE_TYPE_CHECKING_INFO
+                    std::cout << "For loop body has incorrect types in it" << std::endl;
+                #endif
                 return false;
             }
         }
@@ -838,14 +938,18 @@ public:
     }
 
     bool typeCheckWhile(WhileLoop * loop, FunDescriptor * descriptor, std::string * funName) {
-        std::cout << "    Сhecking while loop" << std::endl;
+        #ifdef VERBOSE_TYPE_CHECKING_INFO
+            std::cout << "    Сhecking while loop" << std::endl;
+        #endif
         assert(loop->children.size() > 0);
         assert(loop->children[0]);
         Expression * condition = (Expression * ) loop->children[0];
         if (getTypeNumOfExpr(condition, descriptor) != getTypeRecNum(T_BOOL)) {
-            std::cout << "Condition in WHILE statement must have boolean type in "
-                      << *funName
-                      << std::endl;
+            #ifdef VERBOSE_TYPE_CHECKING_INFO
+                std::cout << "Condition in WHILE statement must have boolean type in "
+                << *funName
+                << std::endl;
+            #endif
             return false;
         }
 
@@ -857,7 +961,9 @@ public:
     }
 
     bool typeCheckPost(PostLoop * loop, FunDescriptor * descriptor, std::string * funName) {
-        std::cout << "    Checking post cond loop" << std::endl;
+        #ifdef VERBOSE_TYPE_CHECKING_INFO
+            std::cout << "    Checking post cond loop" << std::endl;
+        #endif
         assert(loop->children.size() == 2);
         assert(loop->children[0]);
         assert(loop->children[1]);
@@ -865,16 +971,21 @@ public:
         OperatorBlock * body = (OperatorBlock *) loop->children[0];
         bool res = typeCheckBody(body, descriptor, funName);
         if (!res) {
-            std::cout << "Do while loop body is type incorrect in "
-                      << *funName
-                      << std::endl;
+            #ifdef VERBOSE_TYPE_CHECKING_INFO
+                std::cout << "Do while loop body is type incorrect in "
+                << *funName
+                << std::endl;
+            #endif
+            return false;
         }
 
         Expression * condition = (Expression * ) loop->children[1];
         if (getTypeNumOfExpr(condition, descriptor) != getTypeRecNum(T_BOOL)) {
-            std::cout << "Condition in WHILE statement must have boolean type in "
-                      << *funName
-                      << std::endl;
+            #ifdef VERBOSE_TYPE_CHECKING_INFO
+                std::cout << "Condition in WHILE statement must have boolean type in "
+                << *funName
+                << std::endl;
+            #endif
             return false;
         }
 
@@ -901,9 +1012,11 @@ public:
                     int predefinedType = predefParam->typeRecNum;
 
                     if (getTypeRecNum(typeNode->type) != predefinedType) {
-                        std::cout << "Param type does not match predefined "
-                                  << *argName
-                                  << std::endl;
+                        #ifdef VERBOSE_TYPE_CHECKING_INFO
+                            std::cout << "Param type does not match predefined "
+                            << *argName
+                            << std::endl;
+                        #endif
                         return false;
                     }
                     std::string foundName;
@@ -914,33 +1027,43 @@ public:
                         }
                     }
                     if (foundName.size() && *argName != foundName) {
-                        std::cout << "Arg name "
-                        << *argName
-                        << " does not match with name "
-                        << foundName
-                        << " in predefinition"
-                        << std::endl;
+                        #ifdef VERBOSE_TYPE_CHECKING_INFO
+                            std::cout
+                                << "Arg name "
+                                << *argName
+                                << " does not match with name "
+                                << foundName
+                                << " in predefinition"
+                                << std::endl;
+                        #endif
                         return false;
                     }
                     else {
-                        std::cout << "Could not match param with it's name "
-                        << *argName
-                        << std::endl;
+                        #ifdef VERBOSE_TYPE_CHECKING_INFO
+                            std::cout
+                                << "Could not match param with it's name "
+                                << *argName
+                                << std::endl;
+                        #endif
                         return false;
                     }
                 }
             }
             else {
-                std::cout << "Args count in predefinition does not match in further declaration "
-                          << *funName
-                          << std::endl;
+                #ifdef VERBOSE_TYPE_CHECKING_INFO
+                    std::cout << "Args count in predefinition does not match in further declaration "
+                    << *funName
+                    << std::endl;
+                #endif
                 return false;
             }
         }
         else { // predefined return type doesn't match
-            std::cout << "Predefined fun return tupe does not match with further defined "
-                      << *funName
-                      << std::endl;
+            #ifdef VERBOSE_TYPE_CHECKING_INFO
+                std::cout << "Predefined fun return tupe does not match with further defined "
+                << *funName
+                << std::endl;
+            #endif
             return false;
         }
         return true;
