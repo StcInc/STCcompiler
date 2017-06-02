@@ -14,5 +14,9 @@ g++ -o ./out/main -stdlib=libc++ -std=c++11 -Wno-deprecated \
     `llvm-config --cppflags --system-libs --ldflags --libs`  -I/usr/local/opt/llvm/include \
     -L/usr/local/opt/llvm/lib -lllvm out/parser.cpp out/lexer.yy.cpp src/main.cpp
 
-echo "Running..."
-./out/main < src/test.c
+
+if [ $# -eq 0 ]
+  then
+    echo "Running...";
+    ./out/main < src/test.c
+fi

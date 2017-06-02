@@ -55,6 +55,8 @@ L [a-zA-Z]
 "return"         { PRINT_TOKEN; return TOKEN(TRETURN); }
 "break"          { PRINT_TOKEN; return TOKEN(TBREAK); }
 "continue"       { PRINT_TOKEN; return TOKEN(TCONTINUE); }
+"true"           { PRINT_TOKEN; return TOKEN(TTRUE); }
+"false"          { PRINT_TOKEN; return TOKEN(TFALSE); }
 
 "&&"             { PRINT_TOKEN; return TOKEN(TAND); }
 "||"             { PRINT_TOKEN; return TOKEN(TOR); }

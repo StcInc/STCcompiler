@@ -9,8 +9,10 @@
 
 #define LOG(Mess) (std::cout << Mess << std::endl)
 
+
+
 /* Standard types */
-enum Type {
+enum MyBasicType {
     T_VOID = 0,
     T_INT,
     T_CHAR,
@@ -205,7 +207,7 @@ public:
 
 class TypeNode : public Node {
 public:
-    Type type;
+    MyBasicType type;
 
     TypeNode () {
 
@@ -215,11 +217,11 @@ public:
 
     }
 
-    TypeNode(Type t) {
+    TypeNode(MyBasicType t) {
         type = t;
     }
 
-    std::string typeToStr(Type type) {
+    std::string typeToStr(MyBasicType type) {
         switch (type) {
             case T_VOID:   return std::string("VOID");
             case T_INT:    return std::string("INT");
@@ -888,6 +890,10 @@ public:
 
     Commands getCommand () {
         return C_NOOP;
+    }
+
+    bool isPredefinition() {
+        return this->children[3];
     }
 
     void flatten() {

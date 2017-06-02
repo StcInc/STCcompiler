@@ -13,7 +13,7 @@
 
 /* Type descriptor */
 struct TypeRec {
-    Type type;
+    MyBasicType type;
 
     /* Total length of memory area alocated for symbol
         == 0, if variable is not an array
@@ -25,7 +25,7 @@ struct TypeRec {
     */
     std::vector<int> dimens;
 
-    TypeRec(Type t) : type(t), arrayLen(0) { }
+    TypeRec(MyBasicType t) : type(t), arrayLen(0) { }
 };
 
 
@@ -117,7 +117,7 @@ public:
      *   returns number of type descriptor in types table
      *   or -1, if not found
      */
-    int getTypeRecNum(Type type) {
+    int getTypeRecNum(MyBasicType type) {
         for (int i = 0; i < types.size(); ++i) {
             if (types[i]->type == type && types[i]->arrayLen == 0) {
                 return i;
@@ -131,7 +131,7 @@ public:
      * returns number of type descriptor in types table (typeRecNum)
      * or -1, if not found
      */
-    int findArrayTypeId(Type type, int arrayLength, std::vector<int>& dimensions) {
+    int findArrayTypeId(MyBasicType type, int arrayLength, std::vector<int>& dimensions) {
         TypeRec * t;
         for (int i = 0; i < types.size(); ++i) {
             t = types[i];
@@ -445,9 +445,6 @@ public:
                     descriptor->bodyDefined = true;
                 }
             }
-
-
-
             return res;
         }
         else if (!it->second->bodyDefined) {

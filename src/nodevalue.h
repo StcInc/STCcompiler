@@ -26,6 +26,21 @@ enum OpType {
     TCOMP_OP
 };
 
+class NodeValue;
+class StringValue;
+class IntValue;
+class FloatValue;
+class BoolValue;
+class CharValue;
+class BinOp;
+class UnOp;
+
+
+/******************************************************************************/
+/******************              IMPLEMENTATION              ******************/
+/******************************************************************************/
+
+
 class NodeValue {
 public:
     virtual std::string getValue() = 0;
@@ -108,6 +123,15 @@ public:
     bool value;
     BoolValue(bool val) {
         value = val;
+    }
+
+    BoolValue(std::string & val) {
+        if (val == "true") {
+            this->value = true;
+        }
+        else {
+            this->value = false;
+        }
     }
 
     std::string getValue() {
@@ -236,4 +260,4 @@ public:
     }
 };
 
-#endif
+#endif //NODE_VALUE_H

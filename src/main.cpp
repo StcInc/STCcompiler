@@ -11,25 +11,24 @@ int main() {
     yyparse();
     if (program) {
         program->flatten();
-        // program->print();
+
+        std::cout << "AST build:" << std::endl;
+        program->print();
 
         TypeChecker typeChecker;
         if (typeChecker.typeCheck(program)) {
-            std::cout << "; Type check passed" << std::endl;
+            std::cout << "Type check passed" << std::endl;
 
-            // TODO: add other semantics checks like break, continue inside loops, etc.
-
-
-            std::cout << "; Generating code...\n";
-            CodeGenerator codeGenerator(typeChecker);
+            std::cout << "Generating code...\n";
+            CodeGenerator codeGenerator;
             codeGenerator.generate(program);
 
-            std::cout << "; Code is generated.\n";
-            std::cout << "; =========CODE=========\n";
+            std::cout << "Code is generated.\n";
+            std::cout << "=========CODE=========\n";
             codeGenerator.printCode();
         }
         else {
-            std::cout << "; Type check failed" << std::endl;
+            std::cout << "Type check failed" << std::endl;
         }
         delete program;
     }

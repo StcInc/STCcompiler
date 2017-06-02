@@ -17,11 +17,8 @@ void yyerror(const char *s) { printf("ERROR: %sn", s); }
 
 %union {
     int token;
-    int intVal;
-    char charVal;
-    double floatVal;
     std::string* stringVal;
-    bool boolVal;
+    char charVal;
     Node * node;
     NodeValue * nodeVal;
 }
@@ -62,6 +59,8 @@ void yyerror(const char *s) { printf("ERROR: %sn", s); }
 %token TRETURN
 %token TBREAK
 %token TCONTINUE
+%token TTRUE
+%token TFALSE
 
 %token TAND
 %token TOR
@@ -77,8 +76,9 @@ void yyerror(const char *s) { printf("ERROR: %sn", s); }
 %token WHITE_SPACE
 
 %token <stringVal> TID
-%token <intVal> TINTV
-%token <floatVal> TFLOATV
+%token <stringVal> TINTV
+%token <stringVal> TFLOATV
+%token <stringVal> TBOOLV
 
 %type <nodeVal> compare
 
@@ -362,6 +362,7 @@ term : leftPartExpr { $$ = $1; }
     | condition { $$ = $1; }
     | TINTV { $$ = new Literal(new IntValue($<stringVal>1)); }
     | TFLOATV { $$ = new Literal(new FloatValue($<stringVal>1)); }
+    | TBOOLV { $$ = new Literal(new BoolValue($<stringVal>1));}
     | TSTRING_LIT { $$ = new Literal(new StringValue($<stringVal>1)); }
     | TCHAR_LIT { $$ = new Literal(new CharValue($<charVal>1)); }
     ;
