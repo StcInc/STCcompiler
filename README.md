@@ -5,7 +5,7 @@
 
 UML folder is not up to date
 
-> Uses FLEX and BISON 
+> Uses FLEX and BISON, LLVM v4 
 
 Should compile sublanguage of C with type restrictions.
 
